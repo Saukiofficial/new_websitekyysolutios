@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import { Link } from '@inertiajs/react';
 import { Menu, X, ChevronDown, ArrowRight, Check } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useLanguage } from '@/Context/LanguageContext';
 
 // Crisp vector Flag of the United Kingdom (English)
 const UKFlag = () => (
@@ -33,19 +34,19 @@ const IDFlag = () => (
 );
 
 export default function Navbar() {
+    const { lang, setLanguage, t } = useLanguage();
     const [isOpen, setIsOpen] = useState(false);
     const [activeNav, setActiveNav] = useState('Home');
-    const [lang, setLang] = useState('EN');
     const [langDropdown, setLangDropdown] = useState(false);
     const dropdownRef = useRef(null);
 
     const navItems = [
-        { name: 'Home', href: '/' },
-        { name: 'Services', href: '#services' },
-        { name: 'Products', href: '#marketplace' },
-        { name: 'Portfolio', href: '#portfolio' },
-        { name: 'Why Us', href: '#why-us' },
-        { name: 'Process', href: '#how-it-works' },
+        { name: t.nav.home, key: 'Home', href: '/' },
+        { name: t.nav.services, key: 'Services', href: '#services' },
+        { name: t.nav.products, key: 'Products', href: '#marketplace' },
+        { name: t.nav.portfolio, key: 'Portfolio', href: '#portfolio' },
+        { name: t.nav.whyUs, key: 'Why Us', href: '#why-us' },
+        { name: t.nav.process, key: 'Process', href: '#how-it-works' },
     ];
 
     // Close language dropdown on outside click
@@ -87,12 +88,12 @@ export default function Navbar() {
                 {/* Center: Horizontal Navigation Links */}
                 <nav className="hidden lg:flex items-center space-x-8 xl:space-x-10">
                     {navItems.map((item) => {
-                        const isActive = activeNav === item.name;
+                        const isActive = activeNav === item.key;
                         return (
                             <a
-                                key={item.name}
+                                key={item.key}
                                 href={item.href}
-                                onClick={() => setActiveNav(item.name)}
+                                onClick={() => setActiveNav(item.key)}
                                 className={`text-[15px] font-medium transition-colors duration-150 relative py-1 ${
                                     isActive 
                                         ? 'text-[#2563EB] font-semibold' 
@@ -111,7 +112,7 @@ export default function Navbar() {
                     })}
                 </nav>
 
-                {/* Right: Language Selector (with Flags) + Contact Us CTA Button */}
+                {/* Right: Language Selector (with Functional Switcher) + Contact Us CTA Button */}
                 <div className="hidden lg:flex items-center space-x-4 shrink-0">
                     
                     {/* Language Selector Dropdown */}
@@ -138,7 +139,7 @@ export default function Navbar() {
                                 >
                                     {/* English (UK) Option */}
                                     <button
-                                        onClick={() => { setLang('EN'); setLangDropdown(false); }}
+                                        onClick={() => { setLanguage('EN'); setLangDropdown(false); }}
                                         className={`w-full flex items-center justify-between px-3 py-2 text-xs font-semibold rounded-xl transition-colors cursor-pointer ${
                                             lang === 'EN' 
                                                 ? 'text-[#2563EB] bg-blue-50/70' 
@@ -154,7 +155,7 @@ export default function Navbar() {
 
                                     {/* Bahasa Indonesia Option */}
                                     <button
-                                        onClick={() => { setLang('ID'); setLangDropdown(false); }}
+                                        onClick={() => { setLanguage('ID'); setLangDropdown(false); }}
                                         className={`w-full flex items-center justify-between px-3 py-2 text-xs font-semibold rounded-xl transition-colors cursor-pointer ${
                                             lang === 'ID' 
                                                 ? 'text-[#2563EB] bg-blue-50/70' 
@@ -175,7 +176,7 @@ export default function Navbar() {
                     {/* Contact Button */}
                     <a href="#cta">
                         <button className="px-6 py-2.5 rounded-[14px] bg-gradient-to-r from-[#2563EB] to-[#3B82F6] hover:from-[#1D4ED8] hover:to-[#2563EB] text-white text-sm font-semibold shadow-md shadow-blue-500/25 hover:shadow-lg hover:shadow-blue-500/35 hover:-translate-y-0.5 active:translate-y-0 transition-all duration-200 inline-flex items-center group cursor-pointer">
-                            <span>Contact Us</span>
+                            <span>{t.nav.contactUs}</span>
                             <ArrowRight className="w-4 h-4 ml-1.5 group-hover:translate-x-1 transition-transform" />
                         </button>
                     </a>
@@ -200,11 +201,11 @@ export default function Navbar() {
                     <div className="space-y-1">
                         {navItems.map((item) => (
                             <a
-                                key={item.name}
+                                key={item.key}
                                 href={item.href}
-                                onClick={() => { setActiveNav(item.name); setIsOpen(false); }}
+                                onClick={() => { setActiveNav(item.key); setIsOpen(false); }}
                                 className={`block px-4 py-2.5 text-sm rounded-xl font-medium transition-colors ${
-                                    activeNav === item.name 
+                                    activeNav === item.key 
                                         ? 'bg-blue-50 text-[#2563EB] font-bold' 
                                         : 'text-[#14213D] hover:bg-slate-50'
                                 }`}
@@ -216,10 +217,10 @@ export default function Navbar() {
 
                     {/* Language Switcher in Mobile Drawer */}
                     <div className="pt-3 border-t border-slate-100 flex items-center justify-between px-2">
-                        <span className="text-xs font-semibold text-slate-500">Language:</span>
+                        <span className="text-xs font-semibold text-slate-500">{t.nav.language}:</span>
                         <div className="flex items-center space-x-2">
                             <button
-                                onClick={() => setLang('EN')}
+                                onClick={() => setLanguage('EN')}
                                 className={`flex items-center space-x-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors ${
                                     lang === 'EN' ? 'bg-blue-50 text-[#2563EB] border border-blue-200' : 'bg-slate-100 text-slate-600'
                                 }`}
@@ -228,7 +229,7 @@ export default function Navbar() {
                                 <span>EN</span>
                             </button>
                             <button
-                                onClick={() => setLang('ID')}
+                                onClick={() => setLanguage('ID')}
                                 className={`flex items-center space-x-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors ${
                                     lang === 'ID' ? 'bg-blue-50 text-[#2563EB] border border-blue-200' : 'bg-slate-100 text-slate-600'
                                 }`}
@@ -243,7 +244,7 @@ export default function Navbar() {
                     <div className="pt-2">
                         <a href="#cta" onClick={() => setIsOpen(false)} className="w-full block">
                             <button className="w-full py-3 rounded-[14px] bg-gradient-to-r from-[#2563EB] to-[#3B82F6] text-white text-sm font-semibold shadow-md shadow-blue-500/25 flex items-center justify-center">
-                                <span>Contact Us</span>
+                                <span>{t.nav.contactUs}</span>
                                 <ArrowRight className="w-4 h-4 ml-1.5" />
                             </button>
                         </a>

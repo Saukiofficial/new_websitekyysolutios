@@ -7,8 +7,11 @@ import {
     Headphones
 } from 'lucide-react';
 import { staggerContainer, staggerItem } from '@/Lib/animations';
+import { useLanguage } from '@/Context/LanguageContext';
 
 export default function Hero() {
+    const { t } = useLanguage();
+
     return (
         <section className="relative overflow-hidden bg-white pt-28 sm:pt-32 lg:pt-36 pb-16 sm:pb-20 lg:pb-24">
             
@@ -54,7 +57,7 @@ export default function Hero() {
                             className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-blue-50/90 border border-blue-100 text-[#2563EB] text-xs font-semibold mb-6 shadow-xs"
                         >
                             <span className="w-2 h-2 rounded-full bg-[#2563EB]" />
-                            <span>Digital Solutions for Modern Business</span>
+                            <span>{t.hero.badge}</span>
                         </motion.div>
 
                         {/* B. Main Headline (Section 4B) */}
@@ -62,11 +65,11 @@ export default function Hero() {
                             variants={staggerItem}
                             className="text-4xl sm:text-5xl lg:text-[56px] xl:text-[64px] font-extrabold text-[#14213D] leading-[1.08] tracking-tight mb-6"
                         >
-                            We Build Powerful{' '}
+                            {t.hero.headlinePart1}{' '}
                             <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#2563EB] via-[#3B82F6] to-[#4F46E5] block">
-                                Digital Solutions
+                                {t.hero.headlineGradient}
                             </span>{' '}
-                            That Drive Results
+                            {t.hero.headlinePart2}
                         </motion.h1>
 
                         {/* C. Description (Section 4C) */}
@@ -74,7 +77,7 @@ export default function Hero() {
                             variants={staggerItem}
                             className="text-base sm:text-lg text-slate-600 leading-relaxed mb-8 max-w-[540px] font-normal"
                         >
-                            We craft high-performance websites, applications, and digital products that help businesses grow, scale, and succeed in the digital era.
+                            {t.hero.description}
                         </motion.p>
 
                         {/* CTA Buttons (Section 5) */}
@@ -85,7 +88,7 @@ export default function Hero() {
                             {/* Primary Button */}
                             <a href="#services">
                                 <button className="w-full sm:w-auto h-[54px] px-8 rounded-[14px] bg-gradient-to-r from-[#2563EB] to-[#3B82F6] hover:from-[#1D4ED8] hover:to-[#2563EB] text-white font-semibold text-sm shadow-lg shadow-blue-500/25 hover:shadow-xl hover:shadow-blue-500/35 hover:-translate-y-0.5 active:translate-y-0 transition-all duration-200 inline-flex items-center justify-center group cursor-pointer">
-                                    <span>Explore Services</span>
+                                    <span>{t.hero.exploreServices}</span>
                                     <ArrowRight className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" />
                                 </button>
                             </a>
@@ -94,7 +97,7 @@ export default function Hero() {
                             <a href="#marketplace">
                                 <button className="w-full sm:w-auto h-[54px] px-7 rounded-[14px] bg-white border border-slate-200 hover:border-slate-300 hover:bg-slate-50 text-[#14213D] font-semibold text-sm shadow-xs hover:-translate-y-0.5 active:translate-y-0 transition-all duration-200 inline-flex items-center justify-center group cursor-pointer">
                                     <LayoutGrid className="w-4 h-4 mr-2 text-[#2563EB]" />
-                                    <span>Browse Marketplace</span>
+                                    <span>{t.hero.browseMarketplace}</span>
                                 </button>
                             </a>
                         </motion.div>
@@ -110,8 +113,8 @@ export default function Hero() {
                                     <Zap className="w-4 h-4 fill-current" />
                                 </div>
                                 <div className="text-left">
-                                    <h4 className="text-xs sm:text-sm font-bold text-[#14213D] leading-tight">High Quality</h4>
-                                    <p className="text-[11px] text-slate-500 font-normal">Top-notch standards</p>
+                                    <h4 className="text-xs sm:text-sm font-bold text-[#14213D] leading-tight">{t.hero.highQuality}</h4>
+                                    <p className="text-[11px] text-slate-500 font-normal">{t.hero.highQualitySub}</p>
                                 </div>
                             </div>
 
@@ -121,8 +124,8 @@ export default function Hero() {
                                     <Rocket className="w-4 h-4" />
                                 </div>
                                 <div className="text-left">
-                                    <h4 className="text-xs sm:text-sm font-bold text-[#14213D] leading-tight">On-Time Delivery</h4>
-                                    <p className="text-[11px] text-slate-500 font-normal">Always on schedule</p>
+                                    <h4 className="text-xs sm:text-sm font-bold text-[#14213D] leading-tight">{t.hero.onTimeDelivery}</h4>
+                                    <p className="text-[11px] text-slate-500 font-normal">{t.hero.onTimeDeliverySub}</p>
                                 </div>
                             </div>
 
@@ -132,8 +135,8 @@ export default function Hero() {
                                     <Headphones className="w-4 h-4" />
                                 </div>
                                 <div className="text-left">
-                                    <h4 className="text-xs sm:text-sm font-bold text-[#14213D] leading-tight">24/7 Support</h4>
-                                    <p className="text-[11px] text-slate-500 font-normal">We're here for you</p>
+                                    <h4 className="text-xs sm:text-sm font-bold text-[#14213D] leading-tight">{t.hero.support247}</h4>
+                                    <p className="text-[11px] text-slate-500 font-normal">{t.hero.support247Sub}</p>
                                 </div>
                             </div>
                         </motion.div>
@@ -182,10 +185,10 @@ export default function Hero() {
                         {/* Title text */}
                         <div className="text-center lg:text-left shrink-0">
                             <span className="text-xs sm:text-sm font-bold text-[#14213D] block leading-tight">
-                                Trusted by innovative
+                                {t.hero.trustedBy}
                             </span>
                             <span className="text-xs sm:text-sm font-bold text-[#14213D] block leading-tight">
-                                companies worldwide
+                                {t.hero.companiesWorldwide}
                             </span>
                         </div>
 

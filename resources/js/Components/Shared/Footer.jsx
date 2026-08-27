@@ -3,8 +3,8 @@ import {
     Phone, 
     Mail, 
     MapPin, 
-    MessageCircle,
-    ArrowUp
+    MessageCircle, 
+    ArrowUp 
 } from 'lucide-react';
 import { 
     FaGithub, 
@@ -12,8 +12,11 @@ import {
     FaInstagram, 
     FaFacebookF 
 } from 'react-icons/fa6';
+import { useLanguage } from '@/Context/LanguageContext';
 
 export default function Footer() {
+    const { t } = useLanguage();
+
     const scrollToTop = () => {
         window.scrollTo({ top: 0, behavior: 'smooth' });
     };
@@ -24,7 +27,7 @@ export default function Footer() {
         <footer className="bg-[#0B1220] text-slate-400 text-sm border-t border-slate-800">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-16 pb-12">
                 
-                {/* Main 5+1 Columns Grid (Section 22) */}
+                {/* Main 5+1 Columns Grid */}
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-10 lg:gap-8 pb-12 border-b border-slate-800/80">
                     
                     {/* Brand Column (2 cols on lg) */}
@@ -41,10 +44,10 @@ export default function Footer() {
                         </Link>
                         
                         <p className="text-xs sm:text-sm text-slate-400 leading-relaxed font-normal max-w-sm">
-                            Building digital solutions that empower businesses and drive sustainable growth. From concept to enterprise-scale deployment.
+                            {t.footer.description}
                         </p>
 
-                        {/* Social Links (Section 22) */}
+                        {/* Social Links */}
                         <div className="flex items-center space-x-3 pt-2">
                             <a
                                 href="https://github.com"
@@ -97,20 +100,20 @@ export default function Footer() {
                     {/* Column 1: Company */}
                     <div>
                         <h4 className="text-xs font-bold text-white uppercase tracking-wider mb-4">
-                            Company
+                            {t.footer.company}
                         </h4>
                         <ul className="space-y-2.5 text-xs sm:text-sm">
                             <li>
-                                <a href="#services" className="hover:text-white transition-colors">About Us</a>
+                                <a href="#services" className="hover:text-white transition-colors">{t.footer.aboutUs}</a>
                             </li>
                             <li>
-                                <a href="#why-us" className="hover:text-white transition-colors">Our Team</a>
+                                <a href="#why-us" className="hover:text-white transition-colors">{t.footer.ourTeam}</a>
                             </li>
                             <li>
-                                <a href="#portfolio" className="hover:text-white transition-colors">Portfolio</a>
+                                <a href="#portfolio" className="hover:text-white transition-colors">{t.portfolio.title}</a>
                             </li>
                             <li>
-                                <a href="#cta" className="hover:text-white transition-colors">Careers</a>
+                                <a href="#cta" className="hover:text-white transition-colors">{t.footer.careers}</a>
                             </li>
                         </ul>
                     </div>
@@ -118,23 +121,23 @@ export default function Footer() {
                     {/* Column 2: Services */}
                     <div>
                         <h4 className="text-xs font-bold text-white uppercase tracking-wider mb-4">
-                            Services
+                            {t.footer.services}
                         </h4>
                         <ul className="space-y-2.5 text-xs sm:text-sm">
                             <li>
-                                <a href="#services" className="hover:text-white transition-colors">Web Development</a>
+                                <a href="#services" className="hover:text-white transition-colors">{t.footer.webDev}</a>
                             </li>
                             <li>
-                                <a href="#services" className="hover:text-white transition-colors">Mobile Development</a>
+                                <a href="#services" className="hover:text-white transition-colors">{t.footer.mobileDev}</a>
                             </li>
                             <li>
-                                <a href="#services" className="hover:text-white transition-colors">UI/UX Design</a>
+                                <a href="#services" className="hover:text-white transition-colors">{t.footer.uiUxDesign}</a>
                             </li>
                             <li>
-                                <a href="#services" className="hover:text-white transition-colors">API Development</a>
+                                <a href="#services" className="hover:text-white transition-colors">{t.footer.apiDev}</a>
                             </li>
                             <li>
-                                <a href="#services" className="hover:text-white transition-colors">Maintenance</a>
+                                <a href="#services" className="hover:text-white transition-colors">{t.footer.maintenance}</a>
                             </li>
                         </ul>
                     </div>
@@ -142,23 +145,23 @@ export default function Footer() {
                     {/* Column 3: Products */}
                     <div>
                         <h4 className="text-xs font-bold text-white uppercase tracking-wider mb-4">
-                            Products
+                            {t.footer.products}
                         </h4>
                         <ul className="space-y-2.5 text-xs sm:text-sm">
                             <li>
-                                <a href="#marketplace" className="hover:text-white transition-colors">Marketplace</a>
+                                <a href="#marketplace" className="hover:text-white transition-colors">{t.footer.marketplace}</a>
                             </li>
                             <li>
-                                <a href="#marketplace" className="hover:text-white transition-colors">SaaS Systems</a>
+                                <a href="#marketplace" className="hover:text-white transition-colors">{t.footer.saasSystems}</a>
                             </li>
                             <li>
-                                <a href="#marketplace" className="hover:text-white transition-colors">UI Kits</a>
+                                <a href="#marketplace" className="hover:text-white transition-colors">{t.footer.uiKits}</a>
                             </li>
                             <li>
-                                <a href="#marketplace" className="hover:text-white transition-colors">Templates</a>
+                                <a href="#marketplace" className="hover:text-white transition-colors">{t.footer.templates}</a>
                             </li>
                             <li>
-                                <a href="#marketplace" className="hover:text-white transition-colors">Plugins</a>
+                                <a href="#marketplace" className="hover:text-white transition-colors">{t.footer.plugins}</a>
                             </li>
                         </ul>
                     </div>
@@ -166,7 +169,7 @@ export default function Footer() {
                     {/* Column 4: Contact */}
                     <div>
                         <h4 className="text-xs font-bold text-white uppercase tracking-wider mb-4">
-                            Contact
+                            {t.footer.contact}
                         </h4>
                         <ul className="space-y-3 text-xs">
                             <li className="flex items-start space-x-2">
@@ -179,25 +182,25 @@ export default function Footer() {
                             </li>
                             <li className="flex items-start space-x-2">
                                 <MapPin className="w-4 h-4 text-[#2563EB] shrink-0 mt-0.5" />
-                                <span>Jakarta & Yogyakarta, Indonesia</span>
+                                <span>{t.footer.location}</span>
                             </li>
                         </ul>
                     </div>
 
                 </div>
 
-                {/* Bottom Copyright & Back to Top (Section 22) */}
+                {/* Bottom Copyright & Back to Top */}
                 <div className="pt-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-slate-500">
-                    <p>© {currentYear} KyySolutions. All rights reserved.</p>
+                    <p>© {currentYear} KyySolutions. {t.footer.allRightsReserved}</p>
 
                     <div className="flex items-center space-x-6">
-                        <a href="#cta" className="hover:text-slate-400 transition-colors">Privacy Policy</a>
-                        <a href="#cta" className="hover:text-slate-400 transition-colors">Terms of Service</a>
+                        <a href="#cta" className="hover:text-slate-400 transition-colors">{t.footer.privacyPolicy}</a>
+                        <a href="#cta" className="hover:text-slate-400 transition-colors">{t.footer.termsOfService}</a>
                         <button
                             onClick={scrollToTop}
                             className="flex items-center space-x-1.5 text-slate-400 hover:text-white transition-colors cursor-pointer"
                         >
-                            <span>Back to Top</span>
+                            <span>{t.footer.backToTop}</span>
                             <ArrowUp className="w-3.5 h-3.5" />
                         </button>
                     </div>

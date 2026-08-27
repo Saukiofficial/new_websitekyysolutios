@@ -1,216 +1,173 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Star, ArrowRight, Eye, ShoppingCart, Check, Tag } from 'lucide-react';
+import { Star, ArrowRight, Eye, ShoppingCart } from 'lucide-react';
 import Card from '@/Components/Shared/Card';
 import Button from '@/Components/Shared/Button';
 import { fadeInUp, staggerContainer, staggerItem } from '@/Lib/animations';
+import { useLanguage } from '@/Context/LanguageContext';
 
 export default function MarketplacePreview() {
-    const categories = [
-        'All Products',
-        'Source Code',
-        'Templates',
-        'Mobile Apps',
-        'UI Kits',
-        'Plugins',
-        'SaaS Systems'
+    const { t } = useLanguage();
+    const [activeCategoryKey, setActiveCategoryKey] = useState('all');
+
+    const categoryKeys = [
+        { key: 'all', label: t.marketplace.categories.all },
+        { key: 'sourceCode', label: t.marketplace.categories.sourceCode },
+        { key: 'templates', label: t.marketplace.categories.templates },
+        { key: 'mobileApps', label: t.marketplace.categories.mobileApps },
+        { key: 'uiKits', label: t.marketplace.categories.uiKits },
+        { key: 'plugins', label: t.marketplace.categories.plugins },
+        { key: 'saasSystems', label: t.marketplace.categories.saasSystems }
     ];
 
-    const [activeCategory, setActiveCategory] = useState('All Products');
-
-    const products = [
-        {
-            id: 1,
-            title: 'SaaS Multi-Tenant Boilerplate',
-            category: 'SaaS Systems',
-            tech: 'Laravel 13 • React 19 • Inertia',
-            description: 'Production-ready starter with multi-tenancy, Stripe billing, auth & teams.',
-            price: 'Rp 650.000',
-            rating: 4.9,
-            reviews: 38,
-            badge: 'Best Seller',
-            gradient: 'from-blue-600 to-indigo-700',
-            previewIcon: '⚡'
-        },
-        {
-            id: 2,
-            title: 'E-Commerce Admin & POS Kit',
-            category: 'Source Code',
-            tech: 'Laravel • Vue / React • Tailwind',
-            description: 'Complete e-commerce backend with live inventory, invoice & payment gate.',
-            price: 'Rp 450.000',
-            rating: 4.8,
-            reviews: 24,
-            badge: 'Featured',
-            gradient: 'from-slate-800 to-slate-900',
-            previewIcon: '🛍️'
-        },
-        {
-            id: 3,
-            title: 'Fintech Mobile Banking App',
-            category: 'Mobile Apps',
-            tech: 'Flutter • Node.js • PostgreSQL',
-            description: 'Cross-platform mobile wallet template with QR payments & transaction feed.',
-            price: 'Rp 550.000',
-            rating: 4.9,
-            reviews: 19,
-            badge: 'Popular',
-            gradient: 'from-indigo-600 to-purple-700',
-            previewIcon: '💳'
-        },
-        {
-            id: 4,
-            title: 'Design System & UI Component Kit',
-            category: 'UI Kits',
-            tech: 'Figma • Tailwind CSS • React',
-            description: 'Over 200+ accessible components, dark mode tokens & responsive blocks.',
-            price: 'Rp 350.000',
-            rating: 5.0,
-            reviews: 42,
-            badge: 'Top Rated',
-            gradient: 'from-blue-700 to-cyan-700',
-            previewIcon: '🎨'
-        },
+    const productVisuals = [
+        { rating: 4.9, reviews: 38, gradient: 'from-blue-600 to-indigo-700', previewIcon: '⚡', categoryKey: 'saasSystems' },
+        { rating: 4.8, reviews: 24, gradient: 'from-slate-800 to-slate-900', previewIcon: '🛍️', categoryKey: 'sourceCode' },
+        { rating: 4.9, reviews: 19, gradient: 'from-indigo-600 to-purple-700', previewIcon: '💳', categoryKey: 'mobileApps' },
+        { rating: 5.0, reviews: 42, gradient: 'from-blue-500 to-cyan-600', previewIcon: '🎨', categoryKey: 'uiKits' },
     ];
 
-    const filteredProducts = activeCategory === 'All Products'
-        ? products
-        : products.filter(p => p.category === activeCategory);
+    const products = t.marketplace.products.map((prod, index) => ({
+        ...prod,
+        ...productVisuals[index],
+    }));
+
+    const filteredProducts = activeCategoryKey === 'all' 
+        ? products 
+        : products.filter(p => p.categoryKey === activeCategoryKey);
 
     return (
-        <section id="marketplace" className="py-20 md:py-28 bg-white relative">
+        <section id="marketplace" className="py-20 lg:py-28 bg-white relative">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 
-                {/* Section Header (Section 13) */}
-                <motion.div
+                {/* Section Header */}
+                <motion.div 
+                    variants={fadeInUp}
                     initial="hidden"
                     whileInView="visible"
-                    viewport={{ once: true, amount: 0.2 }}
-                    variants={staggerContainer}
+                    viewport={{ once: true, margin: "-100px" }}
                     className="text-center max-w-3xl mx-auto mb-12"
                 >
-                    <motion.div variants={fadeInUp} className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-blue-50 text-[#2563EB] text-xs font-semibold uppercase tracking-wider mb-3">
-                        Ready-to-Deploy
-                    </motion.div>
-                    <motion.h2
-                        variants={fadeInUp}
-                        className="text-3xl sm:text-4xl lg:text-[42px] font-bold text-[#0F172A] tracking-tight leading-tight mb-4"
-                    >
-                        Digital Products Marketplace
-                    </motion.h2>
-                    <motion.p
-                        variants={fadeInUp}
-                        className="text-base sm:text-lg text-slate-600 font-normal leading-relaxed"
-                    >
-                        Ready-made digital solutions to accelerate your project.
-                    </motion.p>
+                    <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-blue-50 border border-blue-100 text-[#2563EB] text-xs font-semibold uppercase tracking-wider mb-4">
+                        <span>{t.marketplace.badge}</span>
+                    </div>
+                    <h2 className="text-3xl sm:text-4xl font-extrabold text-[#14213D] tracking-tight mb-4">
+                        {t.marketplace.title}
+                    </h2>
+                    <p className="text-base sm:text-lg text-slate-600 font-normal leading-relaxed">
+                        {t.marketplace.subtitle}
+                    </p>
                 </motion.div>
 
-                {/* Category Filters Pills (Section 13) */}
+                {/* Category Pills Filter */}
                 <div className="flex items-center justify-center flex-wrap gap-2 mb-12">
-                    {categories.map((cat) => (
-                        <button
-                            key={cat}
-                            onClick={() => setActiveCategory(cat)}
-                            className={`px-4 py-2 rounded-full text-xs sm:text-sm font-medium transition-all duration-150 cursor-pointer ${
-                                activeCategory === cat
-                                    ? 'bg-[#2563EB] text-white shadow-sm'
-                                    : 'bg-slate-100/80 text-slate-600 hover:bg-slate-200/70 hover:text-slate-900'
-                            }`}
-                        >
-                            {cat}
-                        </button>
-                    ))}
+                    {categoryKeys.map((cat) => {
+                        const isActive = activeCategoryKey === cat.key;
+                        return (
+                            <button
+                                key={cat.key}
+                                onClick={() => setActiveCategoryKey(cat.key)}
+                                className={`px-4 py-2 rounded-full text-xs sm:text-sm font-semibold transition-all duration-150 cursor-pointer ${
+                                    isActive
+                                        ? 'bg-[#2563EB] text-white shadow-sm shadow-blue-500/25'
+                                        : 'bg-slate-100 text-slate-600 hover:bg-slate-200/80 hover:text-slate-900'
+                                }`}
+                            >
+                                {cat.label}
+                            </button>
+                        );
+                    })}
                 </div>
 
-                {/* 4-Column Product Cards Grid (Section 13 & 14) */}
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                {/* Products Grid (4 cards on desktop) */}
+                <motion.div 
+                    variants={staggerContainer}
+                    initial="hidden"
+                    whileInView="visible"
+                    viewport={{ once: true, margin: "-100px" }}
+                    className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6"
+                >
                     <AnimatePresence mode="popLayout">
                         {filteredProducts.map((product) => (
-                            <motion.div
-                                key={product.id}
+                            <motion.div 
+                                key={product.id} 
                                 layout
+                                variants={staggerItem}
                                 initial={{ opacity: 0, scale: 0.95 }}
                                 animate={{ opacity: 1, scale: 1 }}
                                 exit={{ opacity: 0, scale: 0.95 }}
-                                transition={{ duration: 0.3 }}
-                                className="h-full"
+                                transition={{ duration: 0.25 }}
                             >
-                                <Card className="p-0 h-full flex flex-col justify-between group bg-white border border-slate-200/90 rounded-xl overflow-hidden hover:border-[#2563EB]/40">
-                                    {/* Thumbnail Preview Banner */}
-                                    <div className={`relative h-44 bg-gradient-to-br ${product.gradient} p-4 flex flex-col justify-between overflow-hidden`}>
-                                        {/* Subtle pattern background */}
-                                        <div className="absolute inset-0 bg-dot-dark opacity-20 pointer-events-none" />
-                                        
-                                        {/* Top Badge & Category */}
-                                        <div className="relative z-10 flex items-center justify-between">
-                                            <span className="px-2.5 py-1 rounded-md bg-white/90 backdrop-blur-sm text-[11px] font-bold text-[#0F172A] shadow-xs">
-                                                {product.category}
-                                            </span>
-                                            <span className="px-2.5 py-1 rounded-md bg-blue-500/80 text-white text-[10px] font-semibold tracking-wide uppercase backdrop-blur-sm">
-                                                {product.badge}
-                                            </span>
-                                        </div>
-
-                                        {/* Center Abstract Graphic / Mock Display */}
-                                        <div className="relative z-10 my-auto text-center">
-                                            <span className="text-3xl filter drop-shadow-md block mb-1">
+                                <Card className="h-full flex flex-col justify-between overflow-hidden group bg-white border-slate-200/90 hover:border-blue-300 transition-all duration-200">
+                                    <div>
+                                        {/* Product Thumbnail / Preview Box */}
+                                        <div className={`h-40 rounded-xl bg-gradient-to-br ${product.gradient} p-4 relative flex items-center justify-center overflow-hidden mb-4`}>
+                                            <span className="text-4xl filter drop-shadow-md group-hover:scale-110 transition-transform duration-200">
                                                 {product.previewIcon}
                                             </span>
-                                            <div className="inline-block px-3 py-1 rounded-md bg-black/30 backdrop-blur-xs text-[11px] font-mono text-white/90 border border-white/10">
-                                                {product.tech}
+                                            
+                                            {/* Badge */}
+                                            <div className="absolute top-3 left-3 bg-white/90 backdrop-blur-md text-[#14213D] text-[10px] font-bold px-2.5 py-1 rounded-full shadow-xs">
+                                                {product.badge}
+                                            </div>
+
+                                            {/* Hover Quick View Overlay */}
+                                            <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center space-x-2">
+                                                <button className="p-2 bg-white rounded-full text-slate-800 hover:text-[#2563EB] shadow-md transition-transform hover:scale-105">
+                                                    <Eye className="w-4 h-4" />
+                                                </button>
+                                                <button className="p-2 bg-[#2563EB] rounded-full text-white shadow-md transition-transform hover:scale-105">
+                                                    <ShoppingCart className="w-4 h-4" />
+                                                </button>
                                             </div>
                                         </div>
+
+                                        {/* Rating & Reviews */}
+                                        <div className="flex items-center justify-between text-xs mb-2">
+                                            <span className="text-[11px] font-semibold text-[#2563EB] bg-blue-50 px-2 py-0.5 rounded-md">
+                                                {product.category}
+                                            </span>
+                                            <div className="flex items-center text-amber-500 font-bold">
+                                                <Star className="w-3.5 h-3.5 fill-current mr-1" />
+                                                <span>{product.rating}</span>
+                                                <span className="text-slate-400 font-normal ml-1">({product.reviews})</span>
+                                            </div>
+                                        </div>
+
+                                        {/* Title & Description */}
+                                        <h3 className="font-bold text-[#14213D] text-base group-hover:text-[#2563EB] transition-colors line-clamp-1 mb-1">
+                                            {product.title}
+                                        </h3>
+                                        <p className="text-xs text-slate-500 line-clamp-2 leading-relaxed mb-3">
+                                            {product.description}
+                                        </p>
                                     </div>
 
-                                    {/* Product Details (Section 14) */}
-                                    <div className="p-5 flex-1 flex flex-col justify-between">
+                                    {/* Price & CTA */}
+                                    <div className="pt-3 border-t border-slate-100 flex items-center justify-between mt-auto">
                                         <div>
-                                            <div className="flex items-center justify-between mb-2">
-                                                <div className="flex items-center text-amber-400">
-                                                    <Star className="w-3.5 h-3.5 fill-current" />
-                                                    <span className="text-xs font-bold text-slate-800 ml-1">{product.rating}</span>
-                                                    <span className="text-[11px] text-slate-400 ml-0.5">({product.reviews})</span>
-                                                </div>
-                                            </div>
-
-                                            <h3 className="text-base font-bold text-[#0F172A] mb-1.5 group-hover:text-[#2563EB] transition-colors line-clamp-1">
-                                                {product.title}
-                                            </h3>
-
-                                            <p className="text-xs text-slate-500 leading-relaxed mb-4 line-clamp-2">
-                                                {product.description}
-                                            </p>
+                                            <span className="text-[10px] text-slate-400 block uppercase font-semibold">{t.marketplace.priceLabel}</span>
+                                            <span className="text-base font-extrabold text-[#14213D]">
+                                                {product.price}
+                                            </span>
                                         </div>
-
-                                        {/* Price & Action Row */}
-                                        <div className="pt-3 border-t border-slate-100 flex items-center justify-between">
-                                            <div>
-                                                <span className="text-[10px] text-slate-400 block leading-none mb-0.5">Price</span>
-                                                <span className="text-base font-bold text-[#0F172A]">{product.price}</span>
-                                            </div>
-                                            <a href="#cta">
-                                                <Button variant="primary" size="sm" className="px-3.5 py-1.5 text-xs">
-                                                    <span>View</span>
-                                                    <ArrowRight className="w-3 h-3 ml-1" />
-                                                </Button>
-                                            </a>
-                                        </div>
+                                        <Button size="sm" variant="outline" className="text-xs px-3 py-1.5 h-8">
+                                            <span>{t.marketplace.view}</span>
+                                            <ArrowRight className="w-3 h-3 ml-1" />
+                                        </Button>
                                     </div>
                                 </Card>
                             </motion.div>
                         ))}
                     </AnimatePresence>
-                </div>
+                </motion.div>
 
-                {/* Bottom Explorer Action */}
+                {/* Bottom CTA to Full Marketplace */}
                 <div className="text-center mt-12">
-                    <a href="#cta">
-                        <Button variant="secondary" size="md" className="group">
-                            <span>View All Marketplace Products</span>
-                            <ArrowRight className="w-4 h-4 ml-1.5 group-hover:translate-x-1 transition-transform" />
-                        </Button>
-                    </a>
+                    <Button variant="outline" className="border-slate-300 hover:border-slate-400">
+                        <span>{t.marketplace.viewAll}</span>
+                        <ArrowRight className="w-4 h-4 ml-2" />
+                    </Button>
                 </div>
 
             </div>

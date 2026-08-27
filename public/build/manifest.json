@@ -15,7 +15,7 @@
     "name": "vendor-react"
   },
   "resources/css/app.css": {
-    "file": "assets/app-jvB3rcZl.css",
+    "file": "assets/app-CAePu1_K.css",
     "src": "resources/css/app.css",
     "isEntry": true,
     "name": "app",
@@ -24,7 +24,7 @@
     ]
   },
   "resources/js/Pages/Public/LandingPage.jsx": {
-    "file": "assets/LandingPage-BJYcZLNC.js",
+    "file": "assets/LandingPage-Bld3pep5.js",
     "name": "LandingPage",
     "src": "resources/js/Pages/Public/LandingPage.jsx",
     "isDynamicEntry": true,
@@ -34,7 +34,7 @@
     ]
   },
   "resources/js/app.jsx": {
-    "file": "assets/app-DmT5uQv_.js",
+    "file": "assets/app-BzY4LEIF.js",
     "name": "app",
     "src": "resources/js/app.jsx",
     "isEntry": true,
@@ -46,7 +46,7 @@
       "resources/js/Pages/Public/LandingPage.jsx"
     ],
     "css": [
-      "assets/app-jvB3rcZl.css"
+      "assets/app-CAePu1_K.css"
     ]
   }
 }

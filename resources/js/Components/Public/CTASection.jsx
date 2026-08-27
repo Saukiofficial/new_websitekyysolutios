@@ -1,17 +1,18 @@
 import { motion } from 'framer-motion';
 import { ArrowRight, ShoppingBag, MessageSquare, CheckCircle2 } from 'lucide-react';
-import Button from '@/Components/Shared/Button';
-import { fadeInUp, staggerContainer, staggerItem } from '@/Lib/animations';
+import { useLanguage } from '@/Context/LanguageContext';
 
 export default function CTASection() {
+    const { t } = useLanguage();
+
     return (
         <section id="cta" className="py-20 md:py-24 bg-white relative">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 
-                {/* Gradient Banner Container (Section 21) */}
+                {/* Gradient Banner Container */}
                 <div className="relative rounded-3xl bg-gradient-to-r from-[#2563EB] via-[#1D4ED8] to-[#4F46E5] text-white p-8 sm:p-12 lg:p-16 overflow-hidden shadow-xl">
                     
-                    {/* Subtle decorative dot/glow pattern (Section 21) */}
+                    {/* Subtle decorative dot/glow pattern */}
                     <div className="absolute inset-0 bg-dot-dark opacity-15 pointer-events-none" />
                     <div className="absolute -top-24 -right-24 w-96 h-96 bg-purple-400/20 rounded-full blur-3xl pointer-events-none" />
                     <div className="absolute -bottom-24 -left-24 w-96 h-96 bg-blue-300/20 rounded-full blur-3xl pointer-events-none" />
@@ -26,7 +27,7 @@ export default function CTASection() {
                             transition={{ duration: 0.5 }}
                             className="text-3xl sm:text-4xl lg:text-[44px] font-extrabold tracking-tight leading-tight mb-4"
                         >
-                            Ready to Start Your Project?
+                            {t.cta.title}
                         </motion.h2>
 
                         {/* Subhead */}
@@ -37,10 +38,10 @@ export default function CTASection() {
                             transition={{ duration: 0.5, delay: 0.1 }}
                             className="text-base sm:text-lg text-blue-100 font-normal leading-relaxed mb-8 max-w-2xl mx-auto"
                         >
-                            Whether you need a custom development solution or a ready-made product, we're here to help you succeed.
+                            {t.cta.subtitle}
                         </motion.p>
 
-                        {/* CTA Buttons (Section 21) */}
+                        {/* CTA Buttons */}
                         <motion.div
                             initial={{ opacity: 0, y: 20 }}
                             whileInView={{ opacity: 1, y: 0 }}
@@ -51,7 +52,7 @@ export default function CTASection() {
                             <a href="https://wa.me/6281234567890" target="_blank" rel="noopener noreferrer" className="w-full sm:w-auto">
                                 <button className="w-full sm:w-auto px-7 py-3.5 rounded-[10px] bg-white text-[#2563EB] font-bold text-sm hover:bg-blue-50 shadow-md transition-all duration-150 inline-flex items-center justify-center group cursor-pointer">
                                     <MessageSquare className="w-4 h-4 mr-2" />
-                                    <span>Request a Quote</span>
+                                    <span>{t.cta.requestQuote}</span>
                                     <ArrowRight className="w-4 h-4 ml-1.5 group-hover:translate-x-1 transition-transform" />
                                 </button>
                             </a>
@@ -59,7 +60,7 @@ export default function CTASection() {
                             <a href="#marketplace" className="w-full sm:w-auto">
                                 <button className="w-full sm:w-auto px-7 py-3.5 rounded-[10px] bg-transparent text-white border border-white/40 hover:bg-white/10 font-semibold text-sm transition-all duration-150 inline-flex items-center justify-center group cursor-pointer">
                                     <ShoppingBag className="w-4 h-4 mr-2 text-blue-200" />
-                                    <span>Browse Marketplace</span>
+                                    <span>{t.cta.browseMarketplace}</span>
                                 </button>
                             </a>
                         </motion.div>
@@ -67,13 +68,13 @@ export default function CTASection() {
                         {/* Micro Trust Points */}
                         <div className="flex flex-wrap items-center justify-center gap-6 text-xs text-blue-100 font-medium">
                             <span className="flex items-center">
-                                <CheckCircle2 className="w-3.5 h-3.5 mr-1.5 text-blue-300" /> Free Consultation
+                                <CheckCircle2 className="w-3.5 h-3.5 mr-1.5 text-blue-300" /> {t.cta.freeConsultation}
                             </span>
                             <span className="flex items-center">
-                                <CheckCircle2 className="w-3.5 h-3.5 mr-1.5 text-blue-300" /> NDA Protected
+                                <CheckCircle2 className="w-3.5 h-3.5 mr-1.5 text-blue-300" /> {t.cta.ndaProtected}
                             </span>
                             <span className="flex items-center">
-                                <CheckCircle2 className="w-3.5 h-3.5 mr-1.5 text-blue-300" /> 100% Satisfaction Guarantee
+                                <CheckCircle2 className="w-3.5 h-3.5 mr-1.5 text-blue-300" /> {t.cta.satisfactionGuarantee}
                             </span>
                         </div>
 
