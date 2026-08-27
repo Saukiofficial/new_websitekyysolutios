@@ -1,15 +1,17 @@
 import { Link } from '@inertiajs/react';
 import { 
-    Github, 
-    Linkedin, 
-    Instagram, 
-    Facebook, 
     Phone, 
     Mail, 
     MapPin, 
     MessageCircle,
     ArrowUp
 } from 'lucide-react';
+import { 
+    FaGithub, 
+    FaLinkedinIn, 
+    FaInstagram, 
+    FaFacebookF 
+} from 'react-icons/fa6';
 
 export default function Footer() {
     const scrollToTop = () => {
@@ -51,7 +53,7 @@ export default function Footer() {
                                 className="w-8 h-8 rounded-lg bg-slate-900 border border-slate-800 flex items-center justify-center text-slate-400 hover:text-white hover:border-slate-700 transition-colors"
                                 aria-label="GitHub"
                             >
-                                <Github className="w-4 h-4" />
+                                <FaGithub className="w-3.5 h-3.5" />
                             </a>
                             <a
                                 href="https://linkedin.com"
@@ -60,7 +62,7 @@ export default function Footer() {
                                 className="w-8 h-8 rounded-lg bg-slate-900 border border-slate-800 flex items-center justify-center text-slate-400 hover:text-white hover:border-slate-700 transition-colors"
                                 aria-label="LinkedIn"
                             >
-                                <Linkedin className="w-4 h-4" />
+                                <FaLinkedinIn className="w-3.5 h-3.5" />
                             </a>
                             <a
                                 href="https://instagram.com"
@@ -69,7 +71,7 @@ export default function Footer() {
                                 className="w-8 h-8 rounded-lg bg-slate-900 border border-slate-800 flex items-center justify-center text-slate-400 hover:text-white hover:border-slate-700 transition-colors"
                                 aria-label="Instagram"
                             >
-                                <Instagram className="w-4 h-4" />
+                                <FaInstagram className="w-3.5 h-3.5" />
                             </a>
                             <a
                                 href="https://facebook.com"
@@ -78,7 +80,7 @@ export default function Footer() {
                                 className="w-8 h-8 rounded-lg bg-slate-900 border border-slate-800 flex items-center justify-center text-slate-400 hover:text-white hover:border-slate-700 transition-colors"
                                 aria-label="Facebook"
                             >
-                                <Facebook className="w-4 h-4" />
+                                <FaFacebookF className="w-3.5 h-3.5" />
                             </a>
                             <a
                                 href="https://wa.me/6281234567890"
