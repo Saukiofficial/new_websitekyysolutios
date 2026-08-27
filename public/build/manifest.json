@@ -1,0 +1,52 @@
+{
+  "_vendor-inertia-CxgCb_XC.js": {
+    "file": "assets/vendor-inertia-CxgCb_XC.js",
+    "name": "vendor-inertia"
+  },
+  "_vendor-motion-D7Kz8LIo.js": {
+    "file": "assets/vendor-motion-D7Kz8LIo.js",
+    "name": "vendor-motion",
+    "imports": [
+      "_vendor-inertia-CxgCb_XC.js"
+    ]
+  },
+  "_vendor-react-l0sNRNKZ.js": {
+    "file": "assets/vendor-react-l0sNRNKZ.js",
+    "name": "vendor-react"
+  },
+  "resources/css/app.css": {
+    "file": "assets/app-jvB3rcZl.css",
+    "src": "resources/css/app.css",
+    "isEntry": true,
+    "name": "app",
+    "names": [
+      "app.css"
+    ]
+  },
+  "resources/js/Pages/Public/LandingPage.jsx": {
+    "file": "assets/LandingPage-BJYcZLNC.js",
+    "name": "LandingPage",
+    "src": "resources/js/Pages/Public/LandingPage.jsx",
+    "isDynamicEntry": true,
+    "imports": [
+      "_vendor-motion-D7Kz8LIo.js",
+      "_vendor-inertia-CxgCb_XC.js"
+    ]
+  },
+  "resources/js/app.jsx": {
+    "file": "assets/app-DmT5uQv_.js",
+    "name": "app",
+    "src": "resources/js/app.jsx",
+    "isEntry": true,
+    "imports": [
+      "_vendor-inertia-CxgCb_XC.js",
+      "_vendor-motion-D7Kz8LIo.js"
+    ],
+    "dynamicImports": [
+      "resources/js/Pages/Public/LandingPage.jsx"
+    ],
+    "css": [
+      "assets/app-jvB3rcZl.css"
+    ]
+  }
+}

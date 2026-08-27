@@ -17,6 +17,19 @@ export default defineConfig({
             '@': '/resources/js',
         },
     },
+    build: {
+        cssMinify: true,
+        minify: 'esbuild',
+        rollupOptions: {
+            output: {
+                manualChunks: {
+                    'vendor-react': ['react', 'react-dom'],
+                    'vendor-inertia': ['@inertiajs/react'],
+                    'vendor-motion': ['framer-motion'],
+                },
+            },
+        },
+    },
     server: {
         host: '0.0.0.0',
         port: 5174,
