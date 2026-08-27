@@ -1,4 +1,12 @@
 {
+  "_PublicLayout-CmkQffpV.js": {
+    "file": "assets/PublicLayout-CmkQffpV.js",
+    "name": "PublicLayout",
+    "imports": [
+      "_vendor-motion-D7Kz8LIo.js",
+      "_vendor-inertia-CxgCb_XC.js"
+    ]
+  },
   "_vendor-inertia-CxgCb_XC.js": {
     "file": "assets/vendor-inertia-CxgCb_XC.js",
     "name": "vendor-inertia"
@@ -15,7 +23,7 @@
     "name": "vendor-react"
   },
   "resources/css/app.css": {
-    "file": "assets/app-CAePu1_K.css",
+    "file": "assets/app-BV7le8f1.css",
     "src": "resources/css/app.css",
     "isEntry": true,
     "name": "app",
@@ -24,17 +32,29 @@
     ]
   },
   "resources/js/Pages/Public/LandingPage.jsx": {
-    "file": "assets/LandingPage-Bld3pep5.js",
+    "file": "assets/LandingPage-CjX8Dvj1.js",
     "name": "LandingPage",
     "src": "resources/js/Pages/Public/LandingPage.jsx",
     "isDynamicEntry": true,
     "imports": [
       "_vendor-motion-D7Kz8LIo.js",
-      "_vendor-inertia-CxgCb_XC.js"
+      "_vendor-inertia-CxgCb_XC.js",
+      "_PublicLayout-CmkQffpV.js"
+    ]
+  },
+  "resources/js/Pages/Public/Marketplace/Index.jsx": {
+    "file": "assets/Index-BFzNn2DX.js",
+    "name": "Index",
+    "src": "resources/js/Pages/Public/Marketplace/Index.jsx",
+    "isDynamicEntry": true,
+    "imports": [
+      "_vendor-motion-D7Kz8LIo.js",
+      "_vendor-inertia-CxgCb_XC.js",
+      "_PublicLayout-CmkQffpV.js"
     ]
   },
   "resources/js/app.jsx": {
-    "file": "assets/app-BzY4LEIF.js",
+    "file": "assets/app-eeRoLZnl.js",
     "name": "app",
     "src": "resources/js/app.jsx",
     "isEntry": true,
@@ -43,10 +63,11 @@
       "_vendor-motion-D7Kz8LIo.js"
     ],
     "dynamicImports": [
-      "resources/js/Pages/Public/LandingPage.jsx"
+      "resources/js/Pages/Public/LandingPage.jsx",
+      "resources/js/Pages/Public/Marketplace/Index.jsx"
     ],
     "css": [
-      "assets/app-CAePu1_K.css"
+      "assets/app-BV7le8f1.css"
     ]
   }
 }
