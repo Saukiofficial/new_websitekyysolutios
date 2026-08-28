@@ -42,11 +42,11 @@ export default function Navbar({ onOpenContact }) {
 
     const navItems = [
         { name: t.nav.home, key: 'Home', href: '/' },
-        { name: t.nav.services, key: 'Services', href: '#services' },
-        { name: t.nav.products, key: 'Products', href: '#marketplace' },
-        { name: t.nav.portfolio, key: 'Portfolio', href: '#portfolio' },
-        { name: t.nav.whyUs, key: 'Why Us', href: '#why-us' },
-        { name: t.nav.process, key: 'Process', href: '#how-it-works' },
+        { name: t.nav.services, key: 'Services', href: '/services' },
+        { name: t.nav.products, key: 'Products', href: '/marketplace' },
+        { name: t.nav.portfolio, key: 'Portfolio', href: '/#portfolio' },
+        { name: t.nav.whyUs, key: 'Why Us', href: '/#why-us' },
+        { name: t.nav.process, key: 'Process', href: '/#how-it-works' },
     ];
 
     // Close language dropdown on outside click

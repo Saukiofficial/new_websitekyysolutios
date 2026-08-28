@@ -3,7 +3,6 @@ import { Head, useForm, Link } from '@inertiajs/react';
 import { 
     Lock, 
     Mail, 
-    KeyRound, 
     Eye, 
     EyeOff, 
     ShieldCheck, 
@@ -12,32 +11,21 @@ import {
     WalletCards, 
     LockKeyhole,
     Globe,
-    CheckCircle2,
     Loader2
 } from 'lucide-react';
-import { motion } from 'framer-motion';
 
 export default function AdminLogin() {
     const [showPassword, setShowPassword] = useState(false);
-    const [otpSent, setOtpSent] = useState(false);
 
     const { data, setData, post, processing, errors } = useForm({
         email: 'admin@kyysolutions.com',
         password: 'password',
-        otp: '',
         remember: false,
     });
 
     const handleSubmit = (e) => {
         e.preventDefault();
         post('/admin/login');
-    };
-
-    const handleSendOtp = () => {
-        setOtpSent(true);
-        setTimeout(() => {
-            setData('otp', '884210');
-        }, 600);
     };
 
     return (
@@ -225,39 +213,6 @@ export default function AdminLogin() {
                                     >
                                         {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                                     </button>
-                                </div>
-                            </div>
-
-                            {/* OTP Field */}
-                            <div>
-                                <div className="flex items-center justify-between mb-1.5">
-                                    <label className="text-xs font-semibold text-[#0F172A] flex items-center space-x-1">
-                                        <span>Kode Verifikasi 2FA / OTP</span>
-                                        <span className="text-[10px] text-slate-400 font-normal">(Opsional)</span>
-                                    </label>
-                                    {!otpSent ? (
-                                        <button
-                                            type="button"
-                                            onClick={handleSendOtp}
-                                            className="text-xs font-bold text-[#2563EB] hover:underline cursor-pointer"
-                                        >
-                                            Kirim OTP
-                                        </button>
-                                    ) : (
-                                        <span className="text-[10px] font-bold text-emerald-600 flex items-center">
-                                            <CheckCircle2 className="w-3 h-3 mr-0.5" /> OTP Terkirim (884210)
-                                        </span>
-                                    )}
-                                </div>
-                                <div className="relative">
-                                    <KeyRound className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
-                                    <input 
-                                        type="text"
-                                        value={data.otp}
-                                        onChange={(e) => setData('otp', e.target.value)}
-                                        placeholder="Masukkan 6-digit kode OTP"
-                                        className="w-full h-11 pl-10 pr-3.5 text-xs sm:text-sm bg-white border border-[#CBD5E1] rounded-xl text-[#0F172A] focus:outline-none focus:border-[#2563EB] focus:ring-3 focus:ring-blue-500/10 font-mono"
-                                    />
                                 </div>
                             </div>
 

@@ -3,6 +3,7 @@
 use App\Http\Controllers\Web\LandingPageController;
 use App\Http\Controllers\Web\MarketplaceController;
 use App\Http\Controllers\Web\ProductController;
+use App\Http\Controllers\Web\ServiceController;
 use App\Http\Controllers\Web\CheckoutController;
 use App\Http\Controllers\Auth\AuthController;
 use App\Http\Controllers\Auth\SellerAuthController;
@@ -31,6 +32,7 @@ use Illuminate\Support\Facades\Route;
 
 // Public Guest Routes
 Route::get('/', LandingPageController::class)->name('home');
+Route::get('/services', [ServiceController::class, 'index'])->name('services.index');
 Route::get('/marketplace', [MarketplaceController::class, 'index'])->name('marketplace.index');
 Route::get('/products/{slug}', [ProductController::class, 'show'])->name('products.show');
 Route::get('/stores/{slug}', [SellerStoreController::class, 'showPublic'])->name('stores.show');
