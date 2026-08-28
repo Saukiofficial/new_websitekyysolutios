@@ -1,6 +1,7 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Head, Link, useForm } from '@inertiajs/react';
 import { motion } from 'framer-motion';
+import { trackEvent } from '@/Lib/analytics';
 import { 
     ShieldCheck, 
     Lock, 
@@ -29,6 +30,12 @@ export default function CheckoutIndex({ product, productId }) {
     const [appliedDiscount, setAppliedDiscount] = useState(0);
     const [couponMessage, setCouponMessage] = useState('');
     const [couponError, setCouponError] = useState('');
+
+    useEffect(() => {
+        if (product?.id) {
+            trackEvent('checkout_start', { productId: product.id, productTitle: product.title });
+        }
+    }, [product?.id]);
 
     const { data, setData, post, processing, errors } = useForm({
         product_id: product?.id || productId || 1,

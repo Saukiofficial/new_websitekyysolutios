@@ -3,108 +3,48 @@
 namespace App\Http\Controllers\Web;
 
 use App\Http\Controllers\Controller;
+use App\Models\Product;
+use App\Models\Order;
+use App\Models\OrderItem;
+use App\Models\Payment;
+use App\Models\ProductAccess;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Inertia\Response;
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\DB;
 
 class CheckoutController extends Controller
 {
-    /**
-     * Master catalog products reference.
-     */
-    protected function getProducts(): array
-    {
-        return [
-            1 => [
-                'id' => 1,
-                'title' => 'SaaS Multi-Tenant Boilerplate Starter',
-                'category' => 'SaaS Systems',
-                'categoryKey' => 'saasSystems',
-                'price' => 650000,
-                'priceFormatted' => 'Rp 650.000',
-                'license' => 'Regular License',
-                'badge' => 'Best Seller',
-                'tech' => ['Laravel 13', 'React 19', 'Inertia.js', 'Stripe', 'MySQL'],
-                'version' => 'v2.4.0',
-                'filesIncluded' => 'Full Source Code, SQL Tenancy Dump, Documentation, Figma Tokens',
-            ],
-            2 => [
-                'id' => 2,
-                'title' => 'E-Commerce Admin & Live POS Terminal Kit',
-                'category' => 'Source Code',
-                'categoryKey' => 'sourceCode',
-                'price' => 450000,
-                'priceFormatted' => 'Rp 450.000',
-                'license' => 'Regular License',
-                'badge' => 'Featured',
-                'tech' => ['Laravel', 'Vue 3 / React', 'Tailwind CSS', 'Midtrans'],
-                'version' => 'v1.8.2',
-                'filesIncluded' => 'Laravel POS Backend, React/Vue Dashboard, Thermal Print Module',
-            ],
-            3 => [
-                'id' => 3,
-                'title' => 'Fintech Mobile Banking App Template',
-                'category' => 'Mobile Apps',
-                'categoryKey' => 'mobileApps',
-                'price' => 550000,
-                'priceFormatted' => 'Rp 550.000',
-                'license' => 'Extended License',
-                'badge' => 'Popular',
-                'tech' => ['Flutter 3', 'Node.js', 'PostgreSQL', 'Firebase'],
-                'version' => 'v3.1.0',
-                'filesIncluded' => 'Flutter iOS & Android Project, Node.js Backend, Figma UI Kit',
-            ],
-            4 => [
-                'id' => 4,
-                'title' => 'Enterprise Design System & UI Component Kit',
-                'category' => 'UI Kits',
-                'categoryKey' => 'uiKits',
-                'price' => 350000,
-                'priceFormatted' => 'Rp 350.000',
-                'license' => 'Regular License',
-                'badge' => 'Top Rated',
-                'tech' => ['Figma', 'Tailwind CSS', 'React 19', 'TypeScript'],
-                'version' => 'v2.0.1',
-                'filesIncluded' => 'Figma 5.0 Auto-Layout, React Tailwind Components, Storybook',
-            ],
-            5 => [
-                'id' => 5,
-                'title' => 'Modern CRM & Sales Pipeline Management',
-                'category' => 'SaaS Systems',
-                'categoryKey' => 'saasSystems',
-                'price' => 590000,
-                'priceFormatted' => 'Rp 590.000',
-                'license' => 'Extended License',
-                'badge' => 'New Release',
-                'tech' => ['Laravel 13', 'React', 'Tailwind', 'Pusher'],
-                'version' => 'v1.2.0',
-                'filesIncluded' => 'Full CRM Source Code, Email Automation Engine, WhatsApp Bot API',
-            ],
-            6 => [
-                'id' => 6,
-                'title' => 'AI Multi-Model Prompt & Chatbot Engine',
-                'category' => 'Plugins & APIs',
-                'categoryKey' => 'plugins',
-                'price' => 490000,
-                'priceFormatted' => 'Rp 490.000',
-                'license' => 'Regular License',
-                'badge' => 'Featured',
-                'tech' => ['Node.js / Python', 'React', 'Vector DB', 'OpenAI'],
-                'version' => 'v2.0.0',
-                'filesIncluded' => 'FastAPI / Express Engine, React Chat UI, Pinecone Indexer',
-            ],
-        ];
-    }
-
     /**
      * Display the checkout page for a selected product.
      */
     public function index(Request $request, ?int $id = null): Response
     {
-        $products = $this->getProducts();
         $productId = $id ?? (int) $request->query('product_id', 1);
-        $product = $products[$productId] ?? $products[1];
+        $productModel = Product::with(['category'])->find($productId);
+
+        if (!$productModel) {
+            $productModel = Product::with(['category'])->first();
+        }
+
+        $product = [
+            'id' => $productModel->id,
+            'slug' => $productModel->slug,
+            'title' => $productModel->title,
+            'category' => $productModel->category?->name ?? 'SaaS Systems',
+            'categoryKey' => $productModel->category?->category_key ?? 'saasSystems',
+            'price' => $productModel->price,
+            'priceFormatted' => $productModel->price_formatted,
+            'extendedPrice' => $productModel->extended_price ?? ($productModel->price * 2),
+            'extendedPriceFormatted' => $productModel->extended_price_formatted,
+            'license' => 'Regular License',
+            'badge' => $productModel->badge,
+            'tech' => $productModel->tech_stack ?? ['Laravel', 'React'],
+            'version' => $productModel->version,
+            'filesIncluded' => 'Full Source Code, SQL Database Dump, Documentation, Figma Tokens',
+        ];
 
         return Inertia::render('Public/Checkout/Index', [
             'product' => $product,
@@ -113,7 +53,7 @@ class CheckoutController extends Controller
     }
 
     /**
-     * Process checkout order submission.
+     * Process checkout order submission and save into MySQL Database.
      */
     public function store(Request $request)
     {
@@ -126,26 +66,98 @@ class CheckoutController extends Controller
             'agree_terms' => 'accepted',
         ]);
 
-        $products = $this->getProducts();
-        $product = $products[$validated['product_id']] ?? $products[1];
+        $product = Product::with(['category', 'seller'])->findOrFail($validated['product_id']);
         
         $orderNumber = 'KYY-ORD-' . date('Ymd') . '-' . strtoupper(Str::random(5));
+        $fee = $validated['payment_method'] === 'qris' ? 0 : 4000;
+        $total = $product->price + $fee;
 
-        return redirect()->route('orders.success', ['orderNumber' => $orderNumber])->with([
-            'order' => [
-                'orderNumber' => $orderNumber,
-                'product' => $product,
-                'buyer' => [
-                    'name' => $validated['name'],
-                    'email' => $validated['email'],
-                    'phone' => $validated['phone'],
-                ],
-                'paymentMethod' => $validated['payment_method'],
-                'subtotal' => $product['price'],
-                'fee' => $validated['payment_method'] === 'qris' ? 0 : 4500,
-                'total' => $product['price'] + ($validated['payment_method'] === 'qris' ? 0 : 4500),
+        // Transactional Database Insert
+        $order = DB::transaction(function () use ($validated, $product, $orderNumber, $fee, $total) {
+            // Find or associate buyer user if logged in / exists
+            $buyer = User::where('email', $validated['email'])->first();
+
+            // 1. Create Order
+            $order = Order::create([
+                'buyer_id' => $buyer?->id,
+                'order_number' => $orderNumber,
+                'customer_name' => $validated['name'],
+                'customer_email' => $validated['email'],
+                'customer_phone' => $validated['phone'],
+                'subtotal' => $product->price,
+                'discount' => 0,
+                'payment_fee' => $fee,
+                'total' => $total,
+                'currency' => 'IDR',
+                'payment_method' => $validated['payment_method'],
+                'status' => 'paid', // Instant auto-verified for demonstration
+                'paid_at' => now(),
+            ]);
+
+            // 2. Create Order Item
+            $orderItem = OrderItem::create([
+                'order_id' => $order->id,
+                'product_id' => $product->id,
+                'seller_id' => $product->seller_id,
+                'product_title_snapshot' => $product->title,
+                'price' => $product->price,
+                'license_type' => 'regular',
+                'commission_rate' => 10.00,
+                'commission_amount' => (int) ($product->price * 0.10),
+                'seller_amount' => (int) ($product->price * 0.90),
+            ]);
+
+            // 3. Create Payment Record
+            Payment::create([
+                'order_id' => $order->id,
+                'provider' => $validated['payment_method'],
+                'provider_reference' => 'PAY-' . strtoupper(Str::random(8)),
+                'payment_method_code' => $validated['payment_method'],
+                'amount' => $total,
                 'status' => 'paid',
-                'paidAt' => now()->format('d M Y, H:i') . ' WIB',
+                'paid_at' => now(),
+            ]);
+
+            // 4. Create Product Access & Commercial License
+            $licenseKey = 'KYY-LIC-' . strtoupper(Str::random(4)) . '-' . strtoupper(Str::random(4)) . '-AUTH';
+            ProductAccess::create([
+                'buyer_id' => $buyer?->id,
+                'buyer_email' => $validated['email'],
+                'product_id' => $product->id,
+                'order_id' => $order->id,
+                'order_item_id' => $orderItem->id,
+                'license_key' => $licenseKey,
+                'license_type' => 'regular',
+                'access_status' => 'active',
+                'access_count' => 0,
+            ]);
+
+            // Increment sales count on product
+            $product->increment('sales_count');
+
+            return $order;
+        });
+
+        return redirect()->route('orders.success', ['orderNumber' => $order->order_number])->with([
+            'order' => [
+                'orderNumber' => $order->order_number,
+                'product' => [
+                    'id' => $product->id,
+                    'title' => $product->title,
+                    'category' => $product->category?->name ?? 'Digital Product',
+                    'version' => $product->version,
+                ],
+                'buyer' => [
+                    'name' => $order->customer_name,
+                    'email' => $order->customer_email,
+                    'phone' => $order->customer_phone,
+                ],
+                'paymentMethod' => $order->payment_method,
+                'subtotal' => $order->subtotal,
+                'fee' => $order->payment_fee,
+                'total' => $order->total,
+                'status' => $order->status,
+                'paidAt' => $order->paid_at->format('d M Y, H:i') . ' WIB',
             ]
         ]);
     }
@@ -155,22 +167,55 @@ class CheckoutController extends Controller
      */
     public function success(Request $request, string $orderNumber): Response
     {
-        $products = $this->getProducts();
-        $order = session('order') ?? [
-            'orderNumber' => $orderNumber,
-            'product' => $products[1],
-            'buyer' => [
-                'name' => 'Customer',
-                'email' => 'customer@example.com',
-                'phone' => '+62 812-3456-7890',
-            ],
-            'paymentMethod' => 'qris',
-            'subtotal' => 650000,
-            'fee' => 0,
-            'total' => 650000,
-            'status' => 'paid',
-            'paidAt' => now()->format('d M Y, H:i') . ' WIB',
-        ];
+        $orderModel = Order::with(['items.product.category', 'accesses'])->where('order_number', $orderNumber)->first();
+
+        if ($orderModel) {
+            $firstItem = $orderModel->items->first();
+            $access = $orderModel->accesses->first();
+
+            $order = [
+                'orderNumber' => $orderModel->order_number,
+                'product' => [
+                    'id' => $firstItem?->product_id ?? 1,
+                    'title' => $firstItem?->product_title_snapshot ?? ($firstItem?->product?->title ?? 'Digital Product'),
+                    'category' => $firstItem?->product?->category?->name ?? 'SaaS Systems',
+                    'version' => $firstItem?->product?->version ?? 'v2.4.0',
+                ],
+                'buyer' => [
+                    'name' => $orderModel->customer_name,
+                    'email' => $orderModel->customer_email,
+                    'phone' => $orderModel->customer_phone,
+                ],
+                'paymentMethod' => $orderModel->payment_method,
+                'subtotal' => $orderModel->subtotal,
+                'fee' => $orderModel->payment_fee,
+                'total' => $orderModel->total,
+                'status' => $orderModel->status,
+                'licenseKey' => $access?->license_key,
+                'paidAt' => $orderModel->paid_at ? $orderModel->paid_at->format('d M Y, H:i') . ' WIB' : now()->format('d M Y, H:i') . ' WIB',
+            ];
+        } else {
+            $order = session('order') ?? [
+                'orderNumber' => $orderNumber,
+                'product' => [
+                    'id' => 1,
+                    'title' => 'SaaS Multi-Tenant Boilerplate Starter',
+                    'category' => 'SaaS Systems',
+                    'version' => 'v2.4.0',
+                ],
+                'buyer' => [
+                    'name' => 'Customer',
+                    'email' => 'customer@example.com',
+                    'phone' => '+62 812-3456-7890',
+                ],
+                'paymentMethod' => 'qris',
+                'subtotal' => 650000,
+                'fee' => 0,
+                'total' => 650000,
+                'status' => 'paid',
+                'paidAt' => now()->format('d M Y, H:i') . ' WIB',
+            ];
+        }
 
         return Inertia::render('Public/Checkout/Success', [
             'order' => $order,

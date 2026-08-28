@@ -71,13 +71,11 @@ export default function Navbar({ onOpenContact }) {
             >
                 {/* Left: Logo & Brand Name */}
                 <Link href="/" className="flex items-center space-x-3 group shrink-0">
-                    <div className="w-10 h-10 rounded-xl bg-blue-50 border border-blue-100 flex items-center justify-center p-1.5 shadow-xs group-hover:scale-105 transition-transform duration-200">
-                        <img 
-                            src="/images/logo/logo.png" 
-                            alt="KyySolutions Logo" 
-                            className="w-full h-full object-contain" 
-                        />
-                    </div>
+                    <img 
+                        src="/images/logo/logo_no_bg.png" 
+                        alt="KyySolutions Logo" 
+                        className="h-10 w-auto object-contain group-hover:scale-105 transition-transform duration-200" 
+                    />
                     <div className="flex items-center">
                         <span className="text-xl font-extrabold text-[#14213D] tracking-tight">
                             Kyy<span className="text-[#2563EB]">Solutions</span>
@@ -173,13 +171,21 @@ export default function Navbar({ onOpenContact }) {
                         </AnimatePresence>
                     </div>
 
+                    {/* Login Portal Link */}
+                    <Link
+                        href="/login"
+                        className="px-3.5 py-1.5 text-xs font-bold text-slate-700 hover:text-[#2563EB] rounded-xl hover:bg-slate-100/80 transition-colors inline-flex items-center space-x-1.5"
+                    >
+                        <span>{lang === 'ID' ? 'Masuk' : 'Login'}</span>
+                    </Link>
+
                     {/* Contact Button */}
                     <button 
                         onClick={onOpenContact || (() => window.location.href = '#cta')}
-                        className="px-6 py-2.5 rounded-[14px] bg-gradient-to-r from-[#2563EB] to-[#3B82F6] hover:from-[#1D4ED8] hover:to-[#2563EB] text-white text-sm font-semibold shadow-md shadow-blue-500/25 hover:shadow-lg hover:shadow-blue-500/35 hover:-translate-y-0.5 active:translate-y-0 transition-all duration-200 inline-flex items-center group cursor-pointer"
+                        className="px-5 py-2.5 rounded-[14px] bg-gradient-to-r from-[#2563EB] to-[#3B82F6] hover:from-[#1D4ED8] hover:to-[#2563EB] text-white text-xs font-bold shadow-md shadow-blue-500/25 hover:shadow-lg hover:shadow-blue-500/35 hover:-translate-y-0.5 active:translate-y-0 transition-all duration-200 inline-flex items-center group cursor-pointer"
                     >
                         <span>{t.nav.contactUs}</span>
-                        <ArrowRight className="w-4 h-4 ml-1.5 group-hover:translate-x-1 transition-transform" />
+                        <ArrowRight className="w-3.5 h-3.5 ml-1.5 group-hover:translate-x-1 transition-transform" />
                     </button>
                 </div>
 
@@ -241,11 +247,19 @@ export default function Navbar({ onOpenContact }) {
                         </div>
                     </div>
 
-                    {/* Contact Action */}
-                    <div className="pt-2">
+                    {/* Actions in Mobile Drawer */}
+                    <div className="pt-2 space-y-2">
+                        <Link
+                            href="/login"
+                            onClick={() => setIsOpen(false)}
+                            className="w-full py-2.5 rounded-[14px] bg-slate-100 hover:bg-slate-200 text-slate-800 text-xs font-bold flex items-center justify-center transition-colors"
+                        >
+                            <span>{lang === 'ID' ? 'Masuk ke Akun / Admin' : 'Login / Admin Portal'}</span>
+                        </Link>
+
                         <button 
                             onClick={() => { setIsOpen(false); if (onOpenContact) onOpenContact(); else window.location.href = '#cta'; }}
-                            className="w-full py-3 rounded-[14px] bg-gradient-to-r from-[#2563EB] to-[#3B82F6] text-white text-sm font-semibold shadow-md shadow-blue-500/25 flex items-center justify-center cursor-pointer"
+                            className="w-full py-3 rounded-[14px] bg-gradient-to-r from-[#2563EB] to-[#3B82F6] text-white text-xs font-bold shadow-md shadow-blue-500/25 flex items-center justify-center cursor-pointer"
                         >
                             <span>{t.nav.contactUs}</span>
                             <ArrowRight className="w-4 h-4 ml-1.5" />

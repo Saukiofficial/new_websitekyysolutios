@@ -281,6 +281,7 @@ export default function MarketplaceIndex({ initialCategory = 'all', searchQuery 
     const catalog = useMemo(() => [
         {
             id: 1,
+            slug: 'saas-multi-tenant-starter',
             title: 'SaaS Multi-Tenant Boilerplate Starter',
             categoryKey: 'saasSystems',
             categoryName: mp.categories?.saasSystems || (lang === 'ID' ? 'Sistem SaaS' : 'SaaS Systems'),
@@ -306,6 +307,7 @@ export default function MarketplaceIndex({ initialCategory = 'all', searchQuery 
         },
         {
             id: 2,
+            slug: 'ecommerce-pos-terminal-kit',
             title: 'E-Commerce Admin & Live POS Terminal Kit',
             categoryKey: 'sourceCode',
             categoryName: mp.categories?.sourceCode || 'Source Code',
@@ -330,6 +332,7 @@ export default function MarketplaceIndex({ initialCategory = 'all', searchQuery 
         },
         {
             id: 3,
+            slug: 'fintech-mobile-banking-app',
             title: 'Fintech Mobile Banking App Template',
             categoryKey: 'mobileApps',
             categoryName: mp.categories?.mobileApps || (lang === 'ID' ? 'Aplikasi Mobile' : 'Mobile Apps'),
@@ -354,6 +357,7 @@ export default function MarketplaceIndex({ initialCategory = 'all', searchQuery 
         },
         {
             id: 4,
+            slug: 'enterprise-design-system-ui-kit',
             title: 'Enterprise Design System & UI Component Kit',
             categoryKey: 'uiKits',
             categoryName: mp.categories?.uiKits || 'UI Kits',
@@ -378,6 +382,7 @@ export default function MarketplaceIndex({ initialCategory = 'all', searchQuery 
         },
         {
             id: 5,
+            slug: 'modern-crm-sales-pipeline',
             title: 'Modern CRM & Sales Pipeline Management',
             categoryKey: 'saasSystems',
             categoryName: mp.categories?.saasSystems || (lang === 'ID' ? 'Sistem SaaS' : 'SaaS Systems'),
@@ -402,6 +407,7 @@ export default function MarketplaceIndex({ initialCategory = 'all', searchQuery 
         },
         {
             id: 6,
+            slug: 'ai-prompt-chatbot-engine',
             title: 'AI Multi-Model Prompt & Chatbot Engine',
             categoryKey: 'plugins',
             categoryName: mp.categories?.plugins || 'Plugins & APIs',
@@ -845,12 +851,12 @@ export default function MarketplaceIndex({ initialCategory = 'all', searchQuery 
                                                         </div>
 
                                                         {/* Title */}
-                                                        <h3 
-                                                            onClick={() => setSelectedProduct(product)}
-                                                            className="font-bold text-[#0F172A] text-[15px] group-hover:text-[#2563EB] transition-colors line-clamp-1 mb-1.5 cursor-pointer leading-snug"
+                                                        <Link 
+                                                            href={`/products/${product.slug || product.id}`}
+                                                            className="font-bold text-[#0F172A] text-[15px] hover:text-[#2563EB] transition-colors line-clamp-1 mb-1.5 leading-snug block"
                                                         >
                                                             {product.title}
-                                                        </h3>
+                                                        </Link>
 
                                                         {/* Description */}
                                                         <p className="text-xs text-[#64748B] line-clamp-2 leading-relaxed mb-3.5 font-normal">
@@ -1022,13 +1028,23 @@ export default function MarketplaceIndex({ initialCategory = 'all', searchQuery 
                                     </span>
                                 </div>
 
-                                <Link
-                                    href={`/checkout/${selectedProduct.id}`}
-                                    className="w-full sm:w-auto px-6 py-3 rounded-xl bg-[#2563EB] hover:bg-[#1D4ED8] text-white text-sm font-bold shadow-lg shadow-blue-500/25 flex items-center justify-center space-x-2"
-                                >
-                                    <ShoppingCart className="w-4 h-4" />
-                                    <span>{lang === 'ID' ? 'Lanjut ke Checkout' : 'Proceed to Checkout'}</span>
-                                </Link>
+                                <div className="flex flex-col sm:flex-row items-center gap-3 w-full sm:w-auto">
+                                    <Link
+                                        href={`/products/${selectedProduct.slug || selectedProduct.id}`}
+                                        className="w-full sm:w-auto px-5 py-3 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs sm:text-sm font-bold flex items-center justify-center space-x-1.5 transition-colors"
+                                    >
+                                        <Eye className="w-4 h-4 text-[#2563EB]" />
+                                        <span>{lang === 'ID' ? 'Lihat Detail Lengkap' : 'View Full Details'}</span>
+                                    </Link>
+
+                                    <Link
+                                        href={`/checkout/${selectedProduct.id}`}
+                                        className="w-full sm:w-auto px-6 py-3 rounded-xl bg-[#2563EB] hover:bg-[#1D4ED8] text-white text-xs sm:text-sm font-bold shadow-lg shadow-blue-500/25 flex items-center justify-center space-x-2"
+                                    >
+                                        <ShoppingCart className="w-4 h-4" />
+                                        <span>{lang === 'ID' ? 'Lanjut ke Checkout' : 'Proceed to Checkout'}</span>
+                                    </Link>
+                                </div>
                             </div>
                         </motion.div>
                     </div>

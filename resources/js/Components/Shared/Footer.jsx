@@ -34,9 +34,9 @@ export default function Footer() {
                     <div className="lg:col-span-2 space-y-4">
                         <Link href="/" className="flex items-center space-x-2.5">
                             <img 
-                                src="/images/logo/logo.png" 
+                                src="/images/logo/logo_no_bg.png" 
                                 alt="KyySolutions Logo" 
-                                className="w-9 h-9 object-contain rounded-lg shadow-sm" 
+                                className="h-9 w-auto object-contain" 
                             />
                             <span className="text-xl font-bold text-white tracking-tight">
                                 Kyy<span className="text-[#2563EB]">Solutions</span>
