@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Head, Link, router } from '@inertiajs/react';
 import AdminLayout from '@/Layouts/AdminLayout';
+import ImageUploadInput from '@/Components/Shared/ImageUploadInput';
 import { 
     Briefcase, 
     Plus, 
@@ -35,7 +36,8 @@ export default function PortfolioIndex({ projects, categories = [], filters = {}
         industry: 'Technology',
         duration: '8 Minggu',
         live_url: '',
-        banner_image: 'https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=1200&auto=format&fit=crop&q=80',
+        banner_image: null,
+        banner_image_url: '',
         problem_statement: '',
         solution_overview: '',
         architecture_summary: '',
@@ -73,10 +75,11 @@ export default function PortfolioIndex({ projects, categories = [], filters = {}
             title: '',
             category: 'SaaS & Cloud',
             client_name: '',
-            industry: 'Technology & Enterprise',
+            industry: 'Technology',
             duration: '8 Minggu',
             live_url: '',
-            banner_image: 'https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=1200&auto=format&fit=crop&q=80',
+            banner_image: null,
+            banner_image_url: '',
             problem_statement: '',
             solution_overview: '',
             architecture_summary: '',
@@ -100,7 +103,8 @@ export default function PortfolioIndex({ projects, categories = [], filters = {}
             industry: p.industry,
             duration: p.duration || '8 Minggu',
             live_url: p.live_url || '',
-            banner_image: p.banner_image || '',
+            banner_image: null,
+            banner_image_url: p.banner_image || '',
             problem_statement: p.problem_statement || '',
             solution_overview: p.solution_overview || '',
             architecture_summary: p.architecture_summary || '',
@@ -118,19 +122,23 @@ export default function PortfolioIndex({ projects, categories = [], filters = {}
     const handleSubmit = (e) => {
         e.preventDefault();
 
-        const payload = {
-            ...formData,
-            tech_stack: formData.tech_stack_input.split(',').map(s => s.trim()).filter(Boolean),
-            deliverables: formData.deliverables_input.split(',').map(s => s.trim()).filter(Boolean),
-            impact_metrics: [
-                { label: 'Efisiensi Waktu', value: '+300%' },
-                { label: 'Uptime Sistem', value: '99.9%' },
-                { label: 'Kecepatan Proses', value: '< 200ms' },
-            ],
-        };
+        const payload = new FormData();
+        Object.keys(formData).forEach(key => {
+            if (formData[key] !== null && formData[key] !== undefined) {
+                payload.append(key, formData[key]);
+            }
+        });
+        
+        payload.append('tech_stack', JSON.stringify(formData.tech_stack_input.split(',').map(s => s.trim()).filter(Boolean)));
+        payload.append('deliverables', JSON.stringify(formData.deliverables_input.split(',').map(s => s.trim()).filter(Boolean)));
+        payload.append('impact_metrics', JSON.stringify([
+            { label: 'Efisiensi Waktu', value: '+300%' },
+            { label: 'Uptime Sistem', value: '99.9%' },
+            { label: 'Kecepatan Proses', value: '< 200ms' },
+        ]));
 
         if (editingProject) {
-            router.put(`/admin/portfolio/${editingProject.id}`, payload, {
+            router.post(`/admin/portfolio/${editingProject.id}?_method=PUT`, payload, {
                 onSuccess: () => setIsModalOpen(false),
             });
         } else {
@@ -460,8 +468,8 @@ export default function PortfolioIndex({ projects, categories = [], filters = {}
                                         </div>
                                     </div>
 
-                                    {/* Durasi, Banner Image, Status */}
-                                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                                    {/* Durasi & Status */}
+                                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                                         <div className="space-y-1.5">
                                             <label className="text-xs font-bold text-slate-700">Durasi Pengerjaan</label>
                                             <input
@@ -469,17 +477,6 @@ export default function PortfolioIndex({ projects, categories = [], filters = {}
                                                 value={formData.duration}
                                                 onChange={(e) => setFormData({ ...formData, duration: e.target.value })}
                                                 placeholder="10 Minggu"
-                                                className="w-full h-10 px-3 rounded-xl border border-slate-200 text-xs focus:border-[#2563EB] focus:outline-none"
-                                            />
-                                        </div>
-
-                                        <div className="space-y-1.5">
-                                            <label className="text-xs font-bold text-slate-700">Banner Image URL</label>
-                                            <input
-                                                type="url"
-                                                value={formData.banner_image}
-                                                onChange={(e) => setFormData({ ...formData, banner_image: e.target.value })}
-                                                placeholder="https://images.unsplash.com/..."
                                                 className="w-full h-10 px-3 rounded-xl border border-slate-200 text-xs focus:border-[#2563EB] focus:outline-none"
                                             />
                                         </div>
@@ -497,6 +494,16 @@ export default function PortfolioIndex({ projects, categories = [], filters = {}
                                             </select>
                                         </div>
                                     </div>
+
+                                    {/* Banner Image Upload */}
+                                    <ImageUploadInput
+                                        label="Banner Mockup / Cover Portofolio"
+                                        recommendedText="1200 × 750 px (Rasio 16:10), Maks 3MB"
+                                        aspectRatio="aspect-[16/10]"
+                                        value={formData.banner_image_url}
+                                        onChangeFile={(file) => setFormData({ ...formData, banner_image: file })}
+                                        onChangeUrl={(url) => setFormData({ ...formData, banner_image_url: url })}
+                                    />
 
                                     {/* Tantangan Proyek (Problem Statement) */}
                                     <div className="space-y-1.5">

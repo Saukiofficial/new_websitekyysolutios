@@ -44,6 +44,7 @@ class AdminProductController extends Controller
                 'salesCount' => $p->sales_count,
                 'rating' => (float) $p->rating,
                 'badge' => $p->badge,
+                'thumbnail' => $p->thumbnail,
                 'status' => $p->status,
                 'publishedAt' => $p->published_at ? $p->published_at->format('d M Y') : '-',
                 'deliveryUrl' => $p->links->first()?->url ?? 'https://github.com/kyysolutions',
@@ -74,7 +75,7 @@ class AdminProductController extends Controller
     }
 
     /**
-     * Store a newly created product.
+     * Store a newly created product with thumbnail upload support.
      */
     public function store(Request $request)
     {
@@ -86,6 +87,9 @@ class AdminProductController extends Controller
             'version' => 'required|string|max:20',
             'badge' => 'nullable|string|max:50',
             'short_description' => 'required|string',
+            'demo_url' => 'nullable|string|max:255',
+            'thumbnail' => 'nullable|image|mimes:jpeg,png,jpg,webp,svg|max:3072',
+            'thumbnail_url' => 'nullable|string|max:500',
             'delivery_type' => 'nullable|string|in:gdrive,github,zip',
             'delivery_url' => 'required|url',
         ]);
@@ -93,6 +97,15 @@ class AdminProductController extends Controller
         $slug = Str::slug($validated['title']) . '-' . Str::random(4);
         $officialStore = Store::where('is_official', true)->first();
         $adminUser = auth()->user() ?? \App\Models\User::where('role', 'admin')->first();
+
+        // Handle thumbnail upload or URL
+        $thumbnail = null;
+        if ($request->hasFile('thumbnail')) {
+            $path = $request->file('thumbnail')->store('products', 'public');
+            $thumbnail = '/storage/' . $path;
+        } elseif ($request->filled('thumbnail_url')) {
+            $thumbnail = $request->input('thumbnail_url');
+        }
 
         $product = Product::create([
             'store_id' => $officialStore?->id,
@@ -104,9 +117,10 @@ class AdminProductController extends Controller
             'extended_price' => $validated['extended_price'] ? (int) $validated['extended_price'] : ((int) $validated['price'] * 2),
             'version' => $validated['version'],
             'badge' => $validated['badge'] ?: 'New Release',
+            'thumbnail' => $thumbnail,
             'short_description' => $validated['short_description'],
             'description' => $validated['short_description'],
-            'demo_url' => $validated['demo_url'],
+            'demo_url' => $validated['demo_url'] ?? null,
             'status' => 'published',
             'published_at' => now(),
             'sales_count' => 0,
@@ -121,7 +135,7 @@ class AdminProductController extends Controller
             'status' => 'active',
         ]);
 
-        return redirect()->route('admin.products')->with('success', 'Produk digital berhasil diterbitkan ke marketplace.');
+        return redirect()->route('admin.products')->with('success', 'Produk digital beserta thumbnail berhasil diterbitkan ke marketplace.');
     }
 
     /**

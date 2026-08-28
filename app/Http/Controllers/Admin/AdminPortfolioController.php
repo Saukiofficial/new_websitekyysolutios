@@ -75,7 +75,7 @@ class AdminPortfolioController extends Controller
     }
 
     /**
-     * Store new portfolio case study.
+     * Store new portfolio case study with banner image upload support.
      */
     public function store(Request $request)
     {
@@ -86,13 +86,14 @@ class AdminPortfolioController extends Controller
             'industry' => 'required|string|max:100',
             'duration' => 'nullable|string|max:50',
             'live_url' => 'nullable|string|max:255',
-            'banner_image' => 'nullable|string|max:500',
+            'banner_image' => 'nullable|image|mimes:jpeg,png,jpg,webp,svg|max:3072',
+            'banner_image_url' => 'nullable|string|max:500',
             'problem_statement' => 'required|string',
             'solution_overview' => 'required|string',
             'architecture_summary' => 'nullable|string',
-            'tech_stack' => 'nullable|array',
-            'deliverables' => 'nullable|array',
-            'impact_metrics' => 'nullable|array',
+            'tech_stack' => 'nullable',
+            'deliverables' => 'nullable',
+            'impact_metrics' => 'nullable',
             'testimonial_quote' => 'nullable|string',
             'testimonial_author' => 'nullable|string',
             'testimonial_role' => 'nullable|string',
@@ -106,9 +107,30 @@ class AdminPortfolioController extends Controller
             $slug .= '-' . ($count + 1);
         }
 
+        // Handle banner image file upload or URL
+        $bannerImage = null;
+        if ($request->hasFile('banner_image')) {
+            $path = $request->file('banner_image')->store('portfolio', 'public');
+            $bannerImage = '/storage/' . $path;
+        } elseif ($request->filled('banner_image_url')) {
+            $bannerImage = $request->input('banner_image_url');
+        }
+
         $validated['slug'] = $slug;
+        $validated['banner_image'] = $bannerImage;
         $validated['duration'] = $validated['duration'] ?: '8 Minggu';
         
+        // Parse array/JSON inputs
+        if (is_string($request->input('tech_stack'))) {
+            $validated['tech_stack'] = json_decode($request->input('tech_stack'), true) ?: array_filter(array_map('trim', explode(',', $request->input('tech_stack'))));
+        }
+        if (is_string($request->input('deliverables'))) {
+            $validated['deliverables'] = json_decode($request->input('deliverables'), true) ?: array_filter(array_map('trim', explode(',', $request->input('deliverables'))));
+        }
+        if (is_string($request->input('impact_metrics'))) {
+            $validated['impact_metrics'] = json_decode($request->input('impact_metrics'), true);
+        }
+
         if (!empty($validated['testimonial_quote'])) {
             $validated['testimonial'] = [
                 'quote' => $validated['testimonial_quote'],
@@ -119,11 +141,11 @@ class AdminPortfolioController extends Controller
 
         PortfolioProject::create($validated);
 
-        return redirect()->back()->with('success', 'Studi kasus portfolio berhasil ditambahkan!');
+        return redirect()->back()->with('success', 'Studi kasus portfolio beserta banner image berhasil ditambahkan!');
     }
 
     /**
-     * Update existing portfolio case study.
+     * Update existing portfolio case study with banner image upload support.
      */
     public function update(Request $request, $id)
     {
@@ -136,13 +158,14 @@ class AdminPortfolioController extends Controller
             'industry' => 'required|string|max:100',
             'duration' => 'nullable|string|max:50',
             'live_url' => 'nullable|string|max:255',
-            'banner_image' => 'nullable|string|max:500',
+            'banner_image' => 'nullable|image|mimes:jpeg,png,jpg,webp,svg|max:3072',
+            'banner_image_url' => 'nullable|string|max:500',
             'problem_statement' => 'required|string',
             'solution_overview' => 'required|string',
             'architecture_summary' => 'nullable|string',
-            'tech_stack' => 'nullable|array',
-            'deliverables' => 'nullable|array',
-            'impact_metrics' => 'nullable|array',
+            'tech_stack' => 'nullable',
+            'deliverables' => 'nullable',
+            'impact_metrics' => 'nullable',
             'testimonial_quote' => 'nullable|string',
             'testimonial_author' => 'nullable|string',
             'testimonial_role' => 'nullable|string',
@@ -157,6 +180,24 @@ class AdminPortfolioController extends Controller
                 $slug .= '-' . ($count + 1);
             }
             $validated['slug'] = $slug;
+        }
+
+        if ($request->hasFile('banner_image')) {
+            $path = $request->file('banner_image')->store('portfolio', 'public');
+            $validated['banner_image'] = '/storage/' . $path;
+        } elseif ($request->filled('banner_image_url')) {
+            $validated['banner_image'] = $request->input('banner_image_url');
+        }
+
+        // Parse array/JSON inputs
+        if (is_string($request->input('tech_stack'))) {
+            $validated['tech_stack'] = json_decode($request->input('tech_stack'), true) ?: array_filter(array_map('trim', explode(',', $request->input('tech_stack'))));
+        }
+        if (is_string($request->input('deliverables'))) {
+            $validated['deliverables'] = json_decode($request->input('deliverables'), true) ?: array_filter(array_map('trim', explode(',', $request->input('deliverables'))));
+        }
+        if (is_string($request->input('impact_metrics'))) {
+            $validated['impact_metrics'] = json_decode($request->input('impact_metrics'), true);
         }
 
         if (!empty($validated['testimonial_quote'])) {

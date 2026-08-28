@@ -13,10 +13,10 @@ class AdminAuthController extends Controller
     /**
      * Show the dedicated Super Admin Login Page.
      */
-    public function showLogin(): Response
+    public function showLogin()
     {
         if (Auth::check() && Auth::user()->role === 'admin') {
-            return Inertia::render('Admin/Dashboard');
+            return redirect()->route('admin.dashboard');
         }
 
         return Inertia::render('Auth/AdminLogin');

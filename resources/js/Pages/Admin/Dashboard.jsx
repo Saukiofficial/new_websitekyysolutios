@@ -27,7 +27,24 @@ import {
 } from 'lucide-react';
 import AdminLayout from '@/Layouts/AdminLayout';
 
-export default function AdminDashboard({ kpi, recentOrders, pendingProducts, recentSellers, activities, serviceRequests }) {
+const defaultKpi = {
+    totalRevenue: { value: 'Rp 1.248.750.000', growth: '+18.6%' },
+    totalOrders: { value: '3.842', growth: '+12.4%' },
+    activeSellers: { value: '215', growth: '+15.3%' },
+    activeProducts: { value: '1.256', growth: '+9.7%' },
+    serviceRequests: { value: '128', growth: '+20.5%' },
+    pendingWithdrawals: { value: 'Rp 78.450.000', growth: '-5.2%' },
+};
+
+export default function AdminDashboard({ 
+    kpi: initialKpi = defaultKpi, 
+    recentOrders = [], 
+    pendingProducts = [], 
+    recentSellers = [], 
+    activities = [], 
+    serviceRequests = [] 
+}) {
+    const kpi = { ...defaultKpi, ...(initialKpi || {}) };
     const [timeRange, setTimeRange] = useState('30d');
     const [hoveredRevenueIndex, setHoveredRevenueIndex] = useState(null);
 

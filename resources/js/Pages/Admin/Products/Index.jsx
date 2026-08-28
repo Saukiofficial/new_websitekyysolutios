@@ -20,6 +20,7 @@ import {
     ChevronDown
 } from 'lucide-react';
 import AdminLayout from '@/Layouts/AdminLayout';
+import ImageUploadInput from '@/Components/Shared/ImageUploadInput';
 
 export default function AdminProductsIndex({ products, categories, counts, filters }) {
     const [selectedStatus, setSelectedStatus] = useState(filters.status || 'all');
@@ -36,6 +37,8 @@ export default function AdminProductsIndex({ products, categories, counts, filte
         extended_price: '',
         version: 'v1.0.0',
         badge: 'New Release',
+        thumbnail: null,
+        thumbnail_url: '',
         short_description: '',
         demo_url: '',
         delivery_url: 'https://github.com/kyysolutions/source-code-private',
@@ -418,6 +421,16 @@ export default function AdminProductsIndex({ products, categories, counts, filte
                                         className="w-full p-3 rounded-xl border border-slate-200 focus:outline-none focus:border-blue-500"
                                     />
                                 </div>
+
+                                <ImageUploadInput
+                                    label="Thumbnail / Mockup Preview Produk"
+                                    recommendedText="1200 × 675 px (Rasio 16:9), Maks 3MB"
+                                    aspectRatio="aspect-video"
+                                    value={data.thumbnail_url}
+                                    onChangeFile={(file) => setData('thumbnail', file)}
+                                    onChangeUrl={(url) => setData('thumbnail_url', url)}
+                                    error={errors.thumbnail || errors.thumbnail_url}
+                                />
 
                                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                                     <div>

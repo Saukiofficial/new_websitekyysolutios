@@ -19,10 +19,10 @@ class SellerAuthController extends Controller
     /**
      * Show dedicated Mitra Developer Login page.
      */
-    public function showLogin(): Response
+    public function showLogin()
     {
         if (Auth::check() && Auth::user()->role === 'seller') {
-            return Inertia::render('Seller/Dashboard');
+            return redirect()->route('seller.dashboard');
         }
 
         return Inertia::render('Auth/SellerLogin');

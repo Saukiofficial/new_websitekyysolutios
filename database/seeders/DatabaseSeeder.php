@@ -13,6 +13,8 @@ class DatabaseSeeder extends Seeder
     {
         $this->call([
             MarketplaceSeeder::class,
+            BlogAndPortfolioSeeder::class,
+            ActivityLogSeeder::class,
         ]);
     }
 }

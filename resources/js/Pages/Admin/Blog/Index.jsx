@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Head, Link, router } from '@inertiajs/react';
 import AdminLayout from '@/Layouts/AdminLayout';
+import ImageUploadInput from '@/Components/Shared/ImageUploadInput';
 import { 
     FileText, 
     Plus, 
@@ -35,7 +36,8 @@ export default function BlogIndex({ posts, categories = [], filters = {}, stats 
         category: 'Software Engineering',
         excerpt: '',
         content: '',
-        cover_image: '',
+        cover_image: null,
+        cover_image_url: '',
         author_name: 'KyySolutions Core Team',
         author_role: 'Principal Software Architect',
         read_time: '5 min baca',
@@ -69,7 +71,8 @@ export default function BlogIndex({ posts, categories = [], filters = {}, stats 
             category: 'Software Engineering',
             excerpt: '',
             content: '',
-            cover_image: 'https://images.unsplash.com/photo-1558494949-ef010cbdcc31?w=1200&auto=format&fit=crop&q=80',
+            cover_image: null,
+            cover_image_url: '',
             author_name: 'KyySolutions Core Team',
             author_role: 'Principal Software Architect',
             read_time: '5 min baca',
@@ -86,7 +89,8 @@ export default function BlogIndex({ posts, categories = [], filters = {}, stats 
             category: post.category,
             excerpt: post.excerpt || '',
             content: post.content,
-            cover_image: post.cover_image || '',
+            cover_image: null,
+            cover_image_url: post.cover_image || '',
             author_name: post.author_name || 'KyySolutions Team',
             author_role: post.author_role || 'Software Architect',
             read_time: post.read_time || '5 min baca',
@@ -98,12 +102,13 @@ export default function BlogIndex({ posts, categories = [], filters = {}, stats 
 
     const handleSubmit = (e) => {
         e.preventDefault();
+        const payload = { ...formData };
         if (editingPost) {
-            router.put(`/admin/blog/${editingPost.id}`, formData, {
+            router.post(`/admin/blog/${editingPost.id}?_method=PUT`, payload, {
                 onSuccess: () => setIsModalOpen(false),
             });
         } else {
-            router.post('/admin/blog', formData, {
+            router.post('/admin/blog', payload, {
                 onSuccess: () => setIsModalOpen(false),
             });
         }
@@ -461,19 +466,18 @@ export default function BlogIndex({ posts, categories = [], filters = {}, stats 
                                         />
                                     </div>
 
-                                    {/* Cover Image & Penulis */}
-                                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                                        <div className="space-y-1.5">
-                                            <label className="text-xs font-bold text-slate-700">Cover Image URL</label>
-                                            <input
-                                                type="url"
-                                                value={formData.cover_image}
-                                                onChange={(e) => setFormData({ ...formData, cover_image: e.target.value })}
-                                                placeholder="https://images.unsplash.com/..."
-                                                className="w-full h-10 px-3 rounded-xl border border-slate-200 text-xs focus:border-[#2563EB] focus:outline-none"
-                                            />
-                                        </div>
+                                    {/* Cover Image Upload */}
+                                    <ImageUploadInput
+                                        label="Cover Image Artikel"
+                                        recommendedText="1280 × 720 px (Rasio 16:9), Maks 3MB"
+                                        aspectRatio="aspect-video"
+                                        value={formData.cover_image_url}
+                                        onChangeFile={(file) => setFormData({ ...formData, cover_image: file })}
+                                        onChangeUrl={(url) => setFormData({ ...formData, cover_image_url: url })}
+                                    />
 
+                                    {/* Penulis & Waktu */}
+                                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                                         <div className="space-y-1.5">
                                             <label className="text-xs font-bold text-slate-700">Nama Penulis</label>
                                             <input
@@ -481,6 +485,17 @@ export default function BlogIndex({ posts, categories = [], filters = {}, stats 
                                                 value={formData.author_name}
                                                 onChange={(e) => setFormData({ ...formData, author_name: e.target.value })}
                                                 placeholder="Nama Engineer / Penulis"
+                                                className="w-full h-10 px-3 rounded-xl border border-slate-200 text-xs focus:border-[#2563EB] focus:outline-none"
+                                            />
+                                        </div>
+
+                                        <div className="space-y-1.5">
+                                            <label className="text-xs font-bold text-slate-700">Role / Jabatan Penulis</label>
+                                            <input
+                                                type="text"
+                                                value={formData.author_role}
+                                                onChange={(e) => setFormData({ ...formData, author_role: e.target.value })}
+                                                placeholder="Contoh: Principal Software Architect"
                                                 className="w-full h-10 px-3 rounded-xl border border-slate-200 text-xs focus:border-[#2563EB] focus:outline-none"
                                             />
                                         </div>

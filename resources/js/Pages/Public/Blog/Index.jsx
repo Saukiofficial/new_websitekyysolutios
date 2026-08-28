@@ -1,13 +1,13 @@
 import { useState, useMemo } from 'react';
 import { Head, Link } from '@inertiajs/react';
 import PublicLayout from '@/Layouts/PublicLayout';
-import { 
-    BookOpen, 
-    Clock, 
-    Calendar, 
-    ArrowRight, 
-    Search, 
-    Tag, 
+import {
+    BookOpen,
+    Clock,
+    Calendar,
+    ArrowRight,
+    Search,
+    Tag,
     X,
     User,
     Zap,
@@ -28,7 +28,7 @@ export default function BlogIndex({ articles = [], categories = [] }) {
     const filteredArticles = useMemo(() => {
         return articles.filter((article) => {
             const matchesTab = activeTab === 'all' || article.categoryKey === activeTab;
-            const matchesSearch = searchQuery.trim() === '' || 
+            const matchesSearch = searchQuery.trim() === '' ||
                 article.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
                 article.excerpt.toLowerCase().includes(searchQuery.toLowerCase()) ||
                 article.tags.some(tag => tag.toLowerCase().includes(searchQuery.toLowerCase()));
@@ -45,14 +45,14 @@ export default function BlogIndex({ articles = [], categories = [] }) {
             </Head>
 
             <div className="bg-[#F8FAFC] text-[#0F172A] pt-28 pb-20 font-sans">
-                
+
                 {/* ═══════════════════════════════════════════════════════
                     1. HERO HEADER SECTION
                    ═══════════════════════════════════════════════════════ */}
                 <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-8 pb-12 text-center">
-                    
+
                     {/* Eyebrow */}
-                    <motion.div 
+                    <motion.div
                         initial={{ opacity: 0, y: -10 }}
                         animate={{ opacity: 1, y: 0 }}
                         className="inline-flex items-center space-x-2 px-4 py-2 rounded-full bg-blue-50 border border-blue-200 text-[#2563EB] text-xs font-bold uppercase tracking-wider mb-6 shadow-xs"
@@ -62,7 +62,7 @@ export default function BlogIndex({ articles = [], categories = [] }) {
                     </motion.div>
 
                     {/* Main Title */}
-                    <motion.h1 
+                    <motion.h1
                         initial={{ opacity: 0, y: 15 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ delay: 0.1 }}
@@ -72,7 +72,7 @@ export default function BlogIndex({ articles = [], categories = [] }) {
                     </motion.h1>
 
                     {/* Subtitle */}
-                    <motion.p 
+                    <motion.p
                         initial={{ opacity: 0, y: 15 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ delay: 0.2 }}
@@ -88,16 +88,16 @@ export default function BlogIndex({ articles = [], categories = [] }) {
                    ═══════════════════════════════════════════════════════ */}
                 {featuredArticle && (
                     <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-12">
-                        <Link 
+                        <Link
                             href={`/blog/${featuredArticle.slug}`}
                             className="block rounded-3xl bg-gradient-to-br from-[#06152E] via-[#081B39] to-[#041126] border border-blue-900/40 p-7 sm:p-10 lg:p-12 text-white shadow-2xl hover:shadow-blue-500/10 hover:border-blue-700/60 transition-all relative overflow-hidden group"
                         >
                             <div className="absolute top-0 right-0 w-[450px] h-[450px] bg-blue-600/15 rounded-full blur-3xl pointer-events-none" />
 
                             <div className="relative z-10 grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
-                                
+
                                 <div className="lg:col-span-8 space-y-4">
-                                    
+
                                     <div className="flex flex-wrap items-center gap-2.5">
                                         <span className="px-3 py-1 rounded-full bg-blue-500/20 text-[#60A5FA] border border-blue-400/20 text-[11px] font-bold uppercase tracking-wider">
                                             Artikel Utama
@@ -140,24 +140,34 @@ export default function BlogIndex({ articles = [], categories = [] }) {
 
                                 </div>
 
-                                {/* Right Side Visual Accent */}
+                                {/* Right Side Visual Accent / Cover Image */}
                                 <div className="lg:col-span-4 hidden lg:flex items-center justify-center">
-                                    <div className="w-full h-48 rounded-2xl bg-white/5 border border-white/10 p-6 flex flex-col justify-between backdrop-blur-xs">
-                                        <div className="flex items-center justify-between text-xs text-blue-300 font-mono">
-                                            <span>KYY/ENGINEERING</span>
-                                            <span>VERIFIED</span>
+                                    {featuredArticle.cover_image ? (
+                                        <div className="w-full h-52 rounded-2xl overflow-hidden border border-white/20 shadow-xl bg-slate-900">
+                                            <img
+                                                src={featuredArticle.cover_image}
+                                                alt={featuredArticle.title}
+                                                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                                            />
                                         </div>
-                                        <div className="space-y-2">
-                                            <span className="text-xs text-slate-400 font-medium block">Topik Populer:</span>
-                                            <div className="flex flex-wrap gap-1.5">
-                                                {featuredArticle.tags.map((t, idx) => (
-                                                    <span key={idx} className="text-[10px] font-semibold px-2 py-0.5 rounded-md bg-white/10 text-slate-200 border border-white/10">
-                                                        #{t}
-                                                    </span>
-                                                ))}
+                                    ) : (
+                                        <div className="w-full h-48 rounded-2xl bg-white/5 border border-white/10 p-6 flex flex-col justify-between backdrop-blur-xs">
+                                            <div className="flex items-center justify-between text-xs text-blue-300 font-mono">
+                                                <span>KYY/ENGINEERING</span>
+                                                <span>VERIFIED</span>
+                                            </div>
+                                            <div className="space-y-2">
+                                                <span className="text-xs text-slate-400 font-medium block">Topik Populer:</span>
+                                                <div className="flex flex-wrap gap-1.5">
+                                                    {featuredArticle.tags.map((t, idx) => (
+                                                        <span key={idx} className="text-[10px] font-semibold px-2 py-0.5 rounded-md bg-white/10 text-slate-200 border border-white/10">
+                                                            #{t}
+                                                        </span>
+                                                    ))}
+                                                </div>
                                             </div>
                                         </div>
-                                    </div>
+                                    )}
                                 </div>
 
                             </div>
@@ -170,7 +180,7 @@ export default function BlogIndex({ articles = [], categories = [] }) {
                    ═══════════════════════════════════════════════════════ */}
                 <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
                     <div className="flex flex-col md:flex-row items-center justify-between gap-4 pb-6 border-b border-slate-200">
-                        
+
                         {/* Interactive Filter Pills */}
                         <div className="flex flex-wrap items-center gap-2 w-full md:w-auto">
                             {categories.map((cat) => {
@@ -179,11 +189,10 @@ export default function BlogIndex({ articles = [], categories = [] }) {
                                     <button
                                         key={cat.key}
                                         onClick={() => setActiveTab(cat.key)}
-                                        className={`px-4 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer ${
-                                            isActive
+                                        className={`px-4 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer ${isActive
                                                 ? 'bg-[#2563EB] text-white shadow-md shadow-blue-500/20'
                                                 : 'bg-white text-slate-600 border border-slate-200 hover:bg-slate-50'
-                                        }`}
+                                            }`}
                                     >
                                         {cat.label}
                                     </button>
@@ -218,7 +227,7 @@ export default function BlogIndex({ articles = [], categories = [] }) {
                     4. ARTICLES GRID
                    ═══════════════════════════════════════════════════════ */}
                 <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-                    
+
                     {filteredArticles.length === 0 ? (
                         <div className="p-12 text-center bg-white rounded-2xl border border-slate-200 my-8">
                             <BookOpen className="w-10 h-10 text-slate-300 mx-auto mb-3" />
@@ -237,12 +246,20 @@ export default function BlogIndex({ articles = [], categories = [] }) {
                                     className="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-xs hover:shadow-xl hover:border-blue-300 hover:-translate-y-1 transition-all flex flex-col justify-between group"
                                 >
                                     <div>
-                                        
-                                        {/* Top Card Gradient Bar */}
-                                        <div className={`h-3 w-full bg-gradient-to-r ${article.gradient}`} />
+                                        {/* Top Card Cover Image or Gradient Bar */}
+                                        {article.cover_image ? (
+                                            <div className="h-44 w-full relative overflow-hidden bg-slate-900 border-b border-slate-100">
+                                                <img
+                                                    src={article.cover_image}
+                                                    alt={article.title}
+                                                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                                                />
+                                            </div>
+                                        ) : (
+                                            <div className={`h-3 w-full bg-gradient-to-r ${article.gradient}`} />
+                                        )}
 
                                         <div className="p-6 sm:p-7 space-y-4">
-                                            
                                             {/* Meta: Category & Read Time */}
                                             <div className="flex items-center justify-between text-xs">
                                                 <span className="text-[11px] font-bold text-[#2563EB] uppercase tracking-wider">
@@ -274,9 +291,7 @@ export default function BlogIndex({ articles = [], categories = [] }) {
                                                     </span>
                                                 ))}
                                             </div>
-
                                         </div>
-
                                     </div>
 
                                     {/* Card Footer: Author & Read Link */}
@@ -298,52 +313,51 @@ export default function BlogIndex({ articles = [], categories = [] }) {
                                             <ArrowRight className="w-3.5 h-3.5" />
                                         </Link>
                                     </div>
-
                                 </motion.div>
                             ))}
-                        </div>
+            </div>
                     )}
 
-                </section>
+        </section>
 
                 {/* ═══════════════════════════════════════════════════════
                     5. BOTTOM NEWSLETTER / CONSULTATION CTA
                    ═══════════════════════════════════════════════════════ */}
-                <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-8">
-                    <div className="bg-white rounded-3xl border border-blue-200 p-8 sm:p-12 shadow-xl flex flex-col lg:flex-row items-center justify-between gap-8">
-                        <div className="space-y-3 max-w-xl text-center lg:text-left">
-                            <span className="text-xs font-bold text-[#2563EB] uppercase tracking-wider">
-                                Kolaborasi Rekayasa Software
-                            </span>
-                            <h3 className="text-2xl sm:text-3xl font-extrabold text-[#0F172A] tracking-tight">
-                                Butuh Solusi Khusus untuk Bisnis Anda?
-                            </h3>
-                            <p className="text-sm text-slate-600 leading-relaxed">
-                                Konsultasikan arsitektur aplikasi Anda dengan tim senior engineer KyySolutions. Dapatkan rekomendasi teknis & estimasi pengerjaan gratis.
-                            </p>
-                        </div>
-
-                        <div className="flex flex-col sm:flex-row items-center gap-3.5 w-full lg:w-auto">
-                            <Link
-                                href="/services"
-                                className="w-full sm:w-auto px-7 py-3.5 rounded-xl bg-[#2563EB] hover:bg-[#1D4ED8] text-white font-bold text-xs shadow-md shadow-blue-500/20 flex items-center justify-center space-x-2 transition-all"
-                            >
-                                <MessageSquare className="w-4 h-4" />
-                                <span>Lihat Paket Layanan Software</span>
-                            </Link>
-
-                            <Link
-                                href="/portfolio"
-                                className="w-full sm:w-auto px-6 py-3.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs transition-colors flex items-center justify-center space-x-1.5"
-                            >
-                                <span>Showcase Portfolio</span>
-                                <ArrowRight className="w-3.5 h-3.5" />
-                            </Link>
-                        </div>
-                    </div>
-                </section>
-
+    <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-8">
+        <div className="bg-white rounded-3xl border border-blue-200 p-8 sm:p-12 shadow-xl flex flex-col lg:flex-row items-center justify-between gap-8">
+            <div className="space-y-3 max-w-xl text-center lg:text-left">
+                <span className="text-xs font-bold text-[#2563EB] uppercase tracking-wider">
+                    Kolaborasi Rekayasa Software
+                </span>
+                <h3 className="text-2xl sm:text-3xl font-extrabold text-[#0F172A] tracking-tight">
+                    Butuh Solusi Khusus untuk Bisnis Anda?
+                </h3>
+                <p className="text-sm text-slate-600 leading-relaxed">
+                    Konsultasikan arsitektur aplikasi Anda dengan tim senior engineer KyySolutions. Dapatkan rekomendasi teknis & estimasi pengerjaan gratis.
+                </p>
             </div>
-        </PublicLayout>
+
+            <div className="flex flex-col sm:flex-row items-center gap-3.5 w-full lg:w-auto">
+                <Link
+                    href="/services"
+                    className="w-full sm:w-auto px-7 py-3.5 rounded-xl bg-[#2563EB] hover:bg-[#1D4ED8] text-white font-bold text-xs shadow-md shadow-blue-500/20 flex items-center justify-center space-x-2 transition-all"
+                >
+                    <MessageSquare className="w-4 h-4" />
+                    <span>Lihat Paket Layanan Software</span>
+                </Link>
+
+                <Link
+                    href="/portfolio"
+                    className="w-full sm:w-auto px-6 py-3.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs transition-colors flex items-center justify-center space-x-1.5"
+                >
+                    <span>Showcase Portfolio</span>
+                    <ArrowRight className="w-3.5 h-3.5" />
+                </Link>
+            </div>
+        </div>
+    </section>
+
+            </div >
+        </PublicLayout >
     );
 }

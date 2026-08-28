@@ -1,0 +1,1 @@
+import{c as o}from"./createLucideIcon-jpdMMbYx.js";const a=[["path",{d:"M7 7h10v10",key:"1tivn9"}],["path",{d:"M7 17 17 7",key:"1vkiza"}]],i=o("arrow-up-right",a);const t=[["line",{x1:"12",x2:"12",y1:"2",y2:"22",key:"7eqyqh"}],["path",{d:"M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6",key:"1b0p4s"}]],n=o("dollar-sign",t);export{i as A,n as D};

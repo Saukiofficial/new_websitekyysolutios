@@ -15,13 +15,13 @@ class AdminSettingController extends Controller
     public function index(): Response
     {
         $settings = [
-            'platformName' => 'KyySolutions Digital Ecosystem',
-            'supportEmail' => 'support@kyysolutions.com',
-            'whatsappContact' => '+62 812-3456-7890',
+            'platformName' => config('app.name', 'KyySolutions'),
+            'supportEmail' => config('mail.from.address', 'support@kyysolutions.com'),
+            'whatsappContact' => env('WHATSAPP_ADMIN_NUMBER', '6281232916758'),
             'commissionRate' => 10,
             'autoApproveVerifiedSellers' => true,
-            'paymentGatewayProvider' => 'Midtrans / QRIS Dynamic',
-            'sandboxMode' => false,
+            'paymentGatewayProvider' => 'Midtrans Snap (Live / Sandbox)',
+            'sandboxMode' => !config('services.midtrans.is_production', false),
             'currency' => 'IDR',
         ];
 

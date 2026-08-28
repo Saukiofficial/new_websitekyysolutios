@@ -16,6 +16,10 @@ return Application::configure(basePath: dirname(__DIR__))
             'api/*',
         ]);
 
+        $middleware->alias([
+            'role' => \App\Http\Middleware\RoleMiddleware::class,
+        ]);
+
         $middleware->web(append: [
             \App\Http\Middleware\HandleInertiaRequests::class,
             \App\Http\Middleware\TrackVisitorActivity::class,

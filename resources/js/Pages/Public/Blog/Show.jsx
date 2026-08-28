@@ -102,6 +102,17 @@ export default function BlogShow({ article, relatedArticles = [] }) {
                         </button>
                     </div>
 
+                    {/* Hero Banner Cover Image */}
+                    {article.cover_image && (
+                        <div className="w-full aspect-video rounded-3xl overflow-hidden shadow-xl border border-slate-200 bg-slate-900 mb-8">
+                            <img 
+                                src={article.cover_image} 
+                                alt={article.title} 
+                                className="w-full h-full object-cover" 
+                            />
+                        </div>
+                    )}
+
                     {/* ═══════════════════════════════════════════════════════
                         2. ARTICLE CONTENT BODY
                        ═══════════════════════════════════════════════════════ */}

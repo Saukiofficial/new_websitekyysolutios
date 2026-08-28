@@ -182,28 +182,57 @@ export default function PortfolioIndex({ projects = [], categories = [] }) {
                                 >
                                     <div>
                                         
-                                        {/* Visual Gradient Header Banner with Impact Metric */}
-                                        <div className={`p-6 sm:p-7 bg-gradient-to-br ${project.gradient} text-white relative overflow-hidden`}>
-                                            <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full blur-2xl pointer-events-none" />
-                                            
-                                            <div className="relative z-10 flex items-center justify-between">
-                                                <span className="text-[10px] font-bold px-2.5 py-1 rounded-full bg-white/20 backdrop-blur-md text-white border border-white/20 uppercase tracking-wider">
-                                                    {project.category}
-                                                </span>
-                                                <span className="text-xs text-slate-300 font-mono font-medium">
-                                                    {project.year}
-                                                </span>
-                                            </div>
+                                        {/* Visual Banner Image or Gradient Header Banner with Impact Metric */}
+                                        <div className={`h-48 relative overflow-hidden text-white ${project.banner_image ? 'bg-slate-900' : `bg-gradient-to-br ${project.gradient}`}`}>
+                                            {project.banner_image ? (
+                                                <>
+                                                    <img 
+                                                        src={project.banner_image} 
+                                                        alt={project.title} 
+                                                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" 
+                                                    />
+                                                    <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/30 to-black/20 p-5 flex flex-col justify-between">
+                                                        <div className="flex items-center justify-between">
+                                                            <span className="text-[10px] font-bold px-2.5 py-1 rounded-full bg-white/20 backdrop-blur-md text-white border border-white/20 uppercase tracking-wider">
+                                                                {project.category}
+                                                            </span>
+                                                            <span className="text-xs text-slate-200 font-mono font-medium">
+                                                                {project.year || '2026'}
+                                                            </span>
+                                                        </div>
+                                                        <div className="flex items-center justify-between">
+                                                            <div className="inline-flex items-center space-x-1.5 px-3 py-1 rounded-lg bg-emerald-500/80 backdrop-blur-xs text-white text-xs font-bold shadow-xs">
+                                                                <TrendingUp className="w-3.5 h-3.5" />
+                                                                <span>{project.impactMetric || '+300% Efisiensi'}</span>
+                                                            </div>
+                                                            <span className="text-xs text-slate-300 font-semibold">{project.client}</span>
+                                                        </div>
+                                                    </div>
+                                                </>
+                                            ) : (
+                                                <div className="p-6 sm:p-7 h-full flex flex-col justify-between">
+                                                    <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full blur-2xl pointer-events-none" />
+                                                    
+                                                    <div className="relative z-10 flex items-center justify-between">
+                                                        <span className="text-[10px] font-bold px-2.5 py-1 rounded-full bg-white/20 backdrop-blur-md text-white border border-white/20 uppercase tracking-wider">
+                                                            {project.category}
+                                                        </span>
+                                                        <span className="text-xs text-slate-300 font-mono font-medium">
+                                                            {project.year}
+                                                        </span>
+                                                    </div>
 
-                                            <div className="relative z-10 mt-6">
-                                                <div className="inline-flex items-center space-x-1.5 px-3 py-1 rounded-lg bg-emerald-500/25 border border-emerald-400/30 text-emerald-300 text-xs font-bold">
-                                                    <TrendingUp className="w-3.5 h-3.5" />
-                                                    <span>{project.impactMetric}</span>
+                                                    <div className="relative z-10">
+                                                        <div className="inline-flex items-center space-x-1.5 px-3 py-1 rounded-lg bg-emerald-500/25 border border-emerald-400/30 text-emerald-300 text-xs font-bold">
+                                                            <TrendingUp className="w-3.5 h-3.5" />
+                                                            <span>{project.impactMetric}</span>
+                                                        </div>
+                                                        <div className="text-xs text-slate-300 font-semibold mt-2">
+                                                            Klien: {project.client}
+                                                        </div>
+                                                    </div>
                                                 </div>
-                                                <div className="text-xs text-slate-300 font-semibold mt-2">
-                                                    Klien: {project.client}
-                                                </div>
-                                            </div>
+                                            )}
                                         </div>
 
                                         {/* Body Details */}

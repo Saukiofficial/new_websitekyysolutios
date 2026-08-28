@@ -78,7 +78,8 @@ export default function ContactModal({ isOpen, onClose }) {
               `🏢 Company/Email: ${company || '-'}\n` +
               `📝 Project Details: ${description || '-'}`;
 
-        const url = `https://wa.me/6281232916758?text=${encodeURIComponent(text)}`;
+        const waNumber = import.meta.env.VITE_WHATSAPP_NUMBER || '6281232916758';
+        const url = `https://wa.me/${waNumber}?text=${encodeURIComponent(text)}`;
         window.open(url, '_blank');
         onClose();
     };

@@ -41,4 +41,12 @@ return [
         'redirect' => env('GOOGLE_REDIRECT_URI', 'http://127.0.0.1:8000/auth/google/callback'),
     ],
 
+    'midtrans' => [
+        'server_key' => env('MIDTRANS_SERVER_KEY', ''),
+        'client_key' => env('MIDTRANS_CLIENT_KEY', ''),
+        'is_production' => env('MIDTRANS_IS_PRODUCTION', false),
+        'is_sanitized' => true,
+        'is_3ds' => true,
+    ],
+
 ];

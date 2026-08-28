@@ -49,6 +49,7 @@ class SellerProductController extends Controller
                     'salesCount' => $p->sales_count,
                     'rating' => (float) $p->rating,
                     'badge' => $p->badge,
+                    'thumbnail' => $p->thumbnail,
                     'status' => $p->status,
                     'deliveryType' => $primaryLink?->type ?? 'gdrive',
                     'deliveryUrl' => $primaryLink?->url ?? 'https://drive.google.com',
@@ -69,7 +70,7 @@ class SellerProductController extends Controller
     }
 
     /**
-     * Store new software product by seller.
+     * Store new software product by seller with thumbnail upload support.
      */
     public function store(Request $request)
     {
@@ -81,12 +82,24 @@ class SellerProductController extends Controller
             'version' => 'required|string|max:20',
             'badge' => 'nullable|string|max:50',
             'short_description' => 'required|string',
+            'demo_url' => 'nullable|string|max:255',
+            'thumbnail' => 'nullable|image|mimes:jpeg,png,jpg,webp,svg|max:3072',
+            'thumbnail_url' => 'nullable|string|max:500',
             'delivery_type' => 'required|in:gdrive,github,zip',
             'delivery_url' => 'required|url',
         ]);
 
         [$seller, $store] = $this->getSellerStore();
         $slug = Str::slug($validated['title']) . '-' . Str::random(4);
+
+        // Handle thumbnail file upload or URL
+        $thumbnail = null;
+        if ($request->hasFile('thumbnail')) {
+            $path = $request->file('thumbnail')->store('products', 'public');
+            $thumbnail = '/storage/' . $path;
+        } elseif ($request->filled('thumbnail_url')) {
+            $thumbnail = $request->input('thumbnail_url');
+        }
 
         $product = Product::create([
             'store_id' => $store?->id,
@@ -98,8 +111,10 @@ class SellerProductController extends Controller
             'extended_price' => $validated['extended_price'] ? (int) $validated['extended_price'] : ((int) $validated['price'] * 2),
             'version' => $validated['version'],
             'badge' => $validated['badge'] ?: 'New Release',
+            'thumbnail' => $thumbnail,
             'short_description' => $validated['short_description'],
             'description' => $validated['short_description'],
+            'demo_url' => $validated['demo_url'] ?? null,
             'status' => 'published',
             'published_at' => now(),
             'sales_count' => 0,
@@ -114,7 +129,7 @@ class SellerProductController extends Controller
             'status' => 'active',
         ]);
 
-        return redirect()->route('seller.products')->with('success', 'Software baru berhasil diunggah dan terbit di marketplace.');
+        return redirect()->route('seller.products')->with('success', 'Software baru beserta thumbnail berhasil diunggah dan terbit di marketplace.');
     }
 
     /**

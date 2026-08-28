@@ -72,7 +72,7 @@ class AdminBlogController extends Controller
     }
 
     /**
-     * Store new blog article.
+     * Store new blog article with cover image upload support.
      */
     public function store(Request $request)
     {
@@ -81,7 +81,8 @@ class AdminBlogController extends Controller
             'category' => 'required|string|max:100',
             'excerpt' => 'nullable|string|max:500',
             'content' => 'required|string',
-            'cover_image' => 'nullable|string|max:500',
+            'cover_image' => 'nullable|image|mimes:jpeg,png,jpg,webp,svg|max:3072',
+            'cover_image_url' => 'nullable|string|max:500',
             'author_name' => 'nullable|string|max:100',
             'author_role' => 'nullable|string|max:100',
             'read_time' => 'nullable|string|max:50',
@@ -95,7 +96,17 @@ class AdminBlogController extends Controller
             $slug .= '-' . ($count + 1);
         }
 
+        // Handle cover image upload or URL
+        $coverImage = null;
+        if ($request->hasFile('cover_image')) {
+            $path = $request->file('cover_image')->store('blog', 'public');
+            $coverImage = '/storage/' . $path;
+        } elseif ($request->filled('cover_image_url')) {
+            $coverImage = $request->input('cover_image_url');
+        }
+
         $validated['slug'] = $slug;
+        $validated['cover_image'] = $coverImage;
         $validated['author_name'] = $validated['author_name'] ?: 'KyySolutions Team';
         $validated['author_role'] = $validated['author_role'] ?: 'Software Architect';
         $validated['read_time'] = $validated['read_time'] ?: '5 min baca';
@@ -103,11 +114,11 @@ class AdminBlogController extends Controller
 
         BlogPost::create($validated);
 
-        return redirect()->back()->with('success', 'Artikel blog berhasil diterbitkan!');
+        return redirect()->back()->with('success', 'Artikel blog beserta cover image berhasil diterbitkan!');
     }
 
     /**
-     * Update existing blog article.
+     * Update existing blog article with cover image upload support.
      */
     public function update(Request $request, $id)
     {
@@ -118,7 +129,8 @@ class AdminBlogController extends Controller
             'category' => 'required|string|max:100',
             'excerpt' => 'nullable|string|max:500',
             'content' => 'required|string',
-            'cover_image' => 'nullable|string|max:500',
+            'cover_image' => 'nullable|image|mimes:jpeg,png,jpg,webp,svg|max:3072',
+            'cover_image_url' => 'nullable|string|max:500',
             'author_name' => 'nullable|string|max:100',
             'author_role' => 'nullable|string|max:100',
             'read_time' => 'nullable|string|max:50',
@@ -133,6 +145,13 @@ class AdminBlogController extends Controller
                 $slug .= '-' . ($count + 1);
             }
             $validated['slug'] = $slug;
+        }
+
+        if ($request->hasFile('cover_image')) {
+            $path = $request->file('cover_image')->store('blog', 'public');
+            $validated['cover_image'] = '/storage/' . $path;
+        } elseif ($request->filled('cover_image_url')) {
+            $validated['cover_image'] = $request->input('cover_image_url');
         }
 
         if ($validated['status'] === 'published' && !$post->published_at) {

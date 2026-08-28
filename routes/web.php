@@ -34,7 +34,11 @@ use App\Http\Controllers\Seller\SellerStoreController;
 use App\Http\Controllers\Api\TrackingController;
 use Illuminate\Support\Facades\Route;
 
-// Public Guest Routes
+/*
+|--------------------------------------------------------------------------
+| 1. Public & Guest Routes
+|--------------------------------------------------------------------------
+*/
 Route::get('/', LandingPageController::class)->name('home');
 Route::get('/services', [ServiceController::class, 'index'])->name('services.index');
 Route::get('/portfolio', [PortfolioController::class, 'index'])->name('portfolio.index');
@@ -45,13 +49,53 @@ Route::get('/marketplace', [MarketplaceController::class, 'index'])->name('marke
 Route::get('/products/{slug}', [ProductController::class, 'show'])->name('products.show');
 Route::get('/stores/{slug}', [SellerStoreController::class, 'showPublic'])->name('stores.show');
 
-// Direct Checkout & Order Routes
+// Direct Checkout & Order Processing
 Route::get('/checkout/{id?}', [CheckoutController::class, 'index'])->name('checkout.index');
 Route::post('/checkout', [CheckoutController::class, 'store'])->name('checkout.store');
 Route::get('/orders/{orderNumber}', [CheckoutController::class, 'success'])->name('orders.success');
+Route::get('/orders/{orderNumber}/check-status', [CheckoutController::class, 'checkStatus'])->name('orders.check-status');
+Route::get('/orders/{orderNumber}/invoice', [CheckoutController::class, 'downloadInvoice'])->name('orders.invoice');
 
-// Customer / Buyer Dashboard Routes
-Route::prefix('dashboard')->group(function () {
+// Lightweight Event & Visitor Tracking API
+Route::post('/api/track-event', [TrackingController::class, 'track'])->name('api.track');
+
+/*
+|--------------------------------------------------------------------------
+| 2. Authentication Routes
+|--------------------------------------------------------------------------
+*/
+// Buyer & General Authentication
+Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
+Route::post('/login', [AuthController::class, 'login']);
+Route::get('/register', [AuthController::class, 'showRegister'])->name('register');
+Route::post('/register', [AuthController::class, 'register']);
+Route::get('/auth/google', [AuthController::class, 'redirectToGoogle'])->name('auth.google');
+Route::get('/auth/google/callback', [AuthController::class, 'handleGoogleCallback'])->name('auth.google.callback');
+Route::get('/forgot-password', [AuthController::class, 'showForgotPassword'])->name('password.request');
+Route::post('/forgot-password', [AuthController::class, 'sendResetLink'])->name('password.email');
+Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
+
+// Dedicated Mitra Developer Authentication
+Route::prefix('seller')->name('seller.')->group(function () {
+    Route::get('/login', [SellerAuthController::class, 'showLogin'])->name('login');
+    Route::post('/login', [SellerAuthController::class, 'login']);
+    Route::get('/register', [SellerAuthController::class, 'showRegister'])->name('register');
+    Route::post('/register', [SellerAuthController::class, 'register']);
+    Route::get('/auth/google', [SellerAuthController::class, 'redirectToGoogle'])->name('auth.google');
+});
+
+// Dedicated Super Admin Authentication
+Route::prefix('admin')->name('admin.')->group(function () {
+    Route::get('/login', [AdminAuthController::class, 'showLogin'])->name('login');
+    Route::post('/login', [AdminAuthController::class, 'login']);
+});
+
+/*
+|--------------------------------------------------------------------------
+| 3. Protected Customer / Buyer Dashboard (`/dashboard/*`)
+|--------------------------------------------------------------------------
+*/
+Route::middleware(['auth', 'role:buyer,seller,admin'])->prefix('dashboard')->group(function () {
     Route::get('/', fn() => redirect()->route('user.my-products'));
     Route::get('/my-products', [UserDashboardController::class, 'myProducts'])->name('user.my-products');
     Route::get('/orders', [UserDashboardController::class, 'orders'])->name('user.orders');
@@ -60,16 +104,12 @@ Route::prefix('dashboard')->group(function () {
     Route::post('/reviews', [UserDashboardController::class, 'submitReview'])->name('user.reviews.store');
 });
 
-// Seller / Vendor Partner Hub Routes
-Route::prefix('seller')->name('seller.')->group(function () {
-    // Dedicated Mitra Developer Authentication
-    Route::get('/login', [SellerAuthController::class, 'showLogin'])->name('login');
-    Route::post('/login', [SellerAuthController::class, 'login']);
-    Route::get('/register', [SellerAuthController::class, 'showRegister'])->name('register');
-    Route::post('/register', [SellerAuthController::class, 'register']);
-    Route::get('/auth/google', [SellerAuthController::class, 'redirectToGoogle'])->name('auth.google');
-
-    // Dashboard & Operations
+/*
+|--------------------------------------------------------------------------
+| 4. Protected Seller / Mitra Studio Hub (`/seller/*`)
+|--------------------------------------------------------------------------
+*/
+Route::middleware(['auth', 'role:seller,admin'])->prefix('seller')->name('seller.')->group(function () {
     Route::get('/', fn() => redirect()->route('seller.dashboard'));
     Route::get('/dashboard', [SellerDashboardController::class, 'index'])->name('dashboard');
     Route::get('/products', [SellerProductController::class, 'index'])->name('products');
@@ -81,27 +121,12 @@ Route::prefix('seller')->name('seller.')->group(function () {
     Route::post('/settings', [SellerStoreController::class, 'update'])->name('settings.update');
 });
 
-// Lightweight Event & Visitor Tracking API
-Route::post('/api/track-event', [TrackingController::class, 'track'])->name('api.track');
-
-// Buyer / General Authentication Routes
-Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
-Route::post('/login', [AuthController::class, 'login']);
-Route::get('/register', [AuthController::class, 'showRegister'])->name('register');
-Route::post('/register', [AuthController::class, 'register']);
-Route::get('/auth/google', [AuthController::class, 'redirectToGoogle'])->name('auth.google');
-Route::get('/auth/google/callback', [AuthController::class, 'handleGoogleCallback'])->name('auth.google.callback');
-Route::get('/forgot-password', [AuthController::class, 'showForgotPassword'])->name('password.request');
-Route::post('/forgot-password', [AuthController::class, 'sendResetLink'])->name('password.email');
-Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
-
-// Super Admin Panel Routes (As defined in docs/Ui/superadmin_design.md & design_login_admin.md)
-Route::prefix('admin')->name('admin.')->group(function () {
-    // Dedicated Super Admin Login
-    Route::get('/login', [AdminAuthController::class, 'showLogin'])->name('login');
-    Route::post('/login', [AdminAuthController::class, 'login']);
-
-    // Admin Operations
+/*
+|--------------------------------------------------------------------------
+| 5. Protected Super Admin Control Panel (`/admin/*`)
+|--------------------------------------------------------------------------
+*/
+Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->group(function () {
     Route::get('/', fn() => redirect()->route('admin.dashboard'));
     Route::get('/dashboard', [AdminDashboardController::class, 'index'])->name('dashboard');
     

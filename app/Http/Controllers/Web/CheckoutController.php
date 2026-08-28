@@ -9,7 +9,9 @@ use App\Models\OrderItem;
 use App\Models\Payment;
 use App\Models\ProductAccess;
 use App\Models\User;
+use App\Services\Payment\MidtransService;
 use Illuminate\Http\Request;
+use Illuminate\Http\JsonResponse;
 use Inertia\Inertia;
 use Inertia\Response;
 use Illuminate\Support\Str;
@@ -19,6 +21,13 @@ use Illuminate\Support\Facades\Auth;
 
 class CheckoutController extends Controller
 {
+    protected MidtransService $midtransService;
+
+    public function __construct(MidtransService $midtransService)
+    {
+        $this->midtransService = $midtransService;
+    }
+
     /**
      * Display the checkout page for a selected product.
      */
@@ -43,6 +52,7 @@ class CheckoutController extends Controller
             'extendedPriceFormatted' => $productModel->extended_price_formatted,
             'license' => 'Regular License',
             'badge' => $productModel->badge,
+            'thumbnail' => $productModel->thumbnail,
             'tech' => $productModel->tech_stack ?? ['Laravel', 'React'],
             'version' => $productModel->version,
             'filesIncluded' => 'Full Source Code, SQL Database Dump, Documentation, Figma Tokens',
@@ -51,11 +61,15 @@ class CheckoutController extends Controller
         return Inertia::render('Public/Checkout/Index', [
             'product' => $product,
             'productId' => $product['id'],
+            'midtransClientKey' => config('services.midtrans.client_key', env('MIDTRANS_CLIENT_KEY', '')),
+            'midtransSnapUrl' => config('services.midtrans.is_production', false)
+                ? 'https://app.midtrans.com/snap/snap.js'
+                : 'https://app.sandbox.midtrans.com/snap/snap.js',
         ]);
     }
 
     /**
-     * Process checkout order submission and save into MySQL Database.
+     * Process checkout order submission and connect to Midtrans Snap Gateway.
      */
     public function store(Request $request)
     {
@@ -65,6 +79,7 @@ class CheckoutController extends Controller
             'email' => 'required|email|max:255',
             'phone' => 'required|string|max:30',
             'payment_method' => 'required|string',
+            'coupon_code' => 'nullable|string|max:50',
             'agree_terms' => 'accepted',
         ]);
 
@@ -72,10 +87,22 @@ class CheckoutController extends Controller
         
         $orderNumber = 'KYY-ORD-' . date('Ymd') . '-' . strtoupper(Str::random(5));
         $fee = $validated['payment_method'] === 'qris' ? 0 : 4000;
-        $total = $product->price + $fee;
+        
+        // Calculate optional coupon discount
+        $discount = 0;
+        if (!empty($validated['coupon_code'])) {
+            $code = strtoupper(trim($validated['coupon_code']));
+            if ($code === 'KYYSPECIAL') {
+                $discount = (int) ($product->price * 0.10);
+            } elseif ($code === 'LAUNCH50') {
+                $discount = (int) ($product->price * 0.15);
+            }
+        }
+
+        $total = ($product->price - $discount) + $fee;
 
         // Transactional Database Insert
-        $order = DB::transaction(function () use ($validated, $product, $orderNumber, $fee, $total) {
+        $order = DB::transaction(function () use ($validated, $product, $orderNumber, $fee, $discount, $total) {
             // Find or automatically create buyer user account
             $buyer = User::where('email', $validated['email'])->first();
             
@@ -94,7 +121,7 @@ class CheckoutController extends Controller
                 Auth::login($buyer);
             }
 
-            // 1. Create Order
+            // 1. Create Order with 'pending' status for payment gateway processing
             $order = Order::create([
                 'buyer_id' => $buyer->id,
                 'order_number' => $orderNumber,
@@ -102,17 +129,18 @@ class CheckoutController extends Controller
                 'customer_email' => $validated['email'],
                 'customer_phone' => $validated['phone'],
                 'subtotal' => $product->price,
-                'discount' => 0,
+                'discount' => $discount,
                 'payment_fee' => $fee,
                 'total' => $total,
                 'currency' => 'IDR',
+                'coupon_code' => $validated['coupon_code'] ?? null,
                 'payment_method' => $validated['payment_method'],
-                'status' => 'paid', // Instant auto-verified
-                'paid_at' => now(),
+                'payment_provider' => 'midtrans',
+                'status' => 'pending',
             ]);
 
             // 2. Create Order Item
-            $orderItem = OrderItem::create([
+            OrderItem::create([
                 'order_id' => $order->id,
                 'product_id' => $product->id,
                 'seller_id' => $product->seller_id,
@@ -124,63 +152,111 @@ class CheckoutController extends Controller
                 'seller_amount' => (int) ($product->price * 0.90),
             ]);
 
-            // 3. Create Payment Record
+            // 3. Create Pending Payment Log
             Payment::create([
                 'order_id' => $order->id,
-                'provider' => $validated['payment_method'],
-                'provider_reference' => 'PAY-' . strtoupper(Str::random(8)),
+                'provider' => 'midtrans',
+                'provider_reference' => 'MID-' . strtoupper(Str::random(8)),
                 'payment_method_code' => $validated['payment_method'],
                 'amount' => $total,
-                'status' => 'paid',
-                'paid_at' => now(),
+                'status' => 'pending',
             ]);
 
-            // 4. Create Product Access & Commercial License
-            $licenseKey = 'KYY-LIC-' . strtoupper(Str::random(4)) . '-' . strtoupper(Str::random(4)) . '-AUTH';
-            ProductAccess::create([
-                'buyer_id' => $buyer->id,
-                'buyer_email' => $validated['email'],
-                'product_id' => $product->id,
-                'order_id' => $order->id,
-                'order_item_id' => $orderItem->id,
-                'license_key' => $licenseKey,
-                'license_type' => 'regular',
-                'access_status' => 'active',
-                'access_count' => 0,
-            ]);
-
-            // Increment sales count on product
-            $product->increment('sales_count');
-
-            return $order;
+            return [$order, $buyer];
         });
 
-        return redirect()->route('orders.success', ['orderNumber' => $order->order_number])->with([
-            'order' => [
-                'orderNumber' => $order->order_number,
-                'product' => [
-                    'id' => $product->id,
-                    'title' => $product->title,
-                    'category' => $product->category?->name ?? 'Digital Product',
-                    'version' => $product->version,
-                ],
-                'buyer' => [
-                    'name' => $order->customer_name,
-                    'email' => $order->customer_email,
-                    'phone' => $order->customer_phone,
-                ],
-                'paymentMethod' => $order->payment_method,
-                'subtotal' => $order->subtotal,
-                'fee' => $order->payment_fee,
-                'total' => $order->total,
-                'status' => $order->status,
-                'paidAt' => $order->paid_at->format('d M Y, H:i') . ' WIB',
-            ]
+        [$createdOrder, $buyerUser] = $order;
+
+        // Generate Midtrans Snap Transaction Token
+        $snapResult = $this->midtransService->createSnapTransaction($createdOrder, $product, $buyerUser, $total);
+        
+        $createdOrder->snap_token = $snapResult['token'] ?? null;
+        $createdOrder->payment_url = $snapResult['redirect_url'] ?? null;
+
+        // If mock mode (no midtrans keys entered yet), auto-settle for seamless local testing
+        if (!empty($snapResult['is_mock'])) {
+            $this->midtransService->processOrderSettlement($createdOrder, [
+                'transaction_id' => 'MID-MOCK-' . strtoupper(Str::random(8)),
+                'payment_type' => $validated['payment_method'],
+            ]);
+        } else {
+            $createdOrder->save();
+        }
+
+        return redirect()->route('orders.success', ['orderNumber' => $createdOrder->order_number])->with([
+            'snap_token' => $createdOrder->snap_token,
+            'payment_url' => $createdOrder->payment_url,
+            'is_mock' => $snapResult['is_mock'] ?? false,
         ]);
     }
 
     /**
-     * Display order success & product download access page.
+     * Real-time Check Order Status Endpoint (Failover / Anti-Delay Webhook).
+     */
+    public function checkStatus(Request $request, string $orderNumber): JsonResponse
+    {
+        $order = Order::with(['items.product'])->where('order_number', $orderNumber)->first();
+
+        if (!$order) {
+            return response()->json(['status' => 'error', 'message' => 'Pesanan tidak ditemukan.'], 404);
+        }
+
+        // If already paid, return instantly
+        if ($order->status === 'paid') {
+            return response()->json([
+                'status' => 'paid',
+                'is_paid' => true,
+                'paid_at' => $order->paid_at ? $order->paid_at->format('d M Y, H:i') . ' WIB' : now()->format('d M Y, H:i') . ' WIB',
+                'message' => 'Pembayaran telah terverifikasi lunas.',
+            ]);
+        }
+
+        // Query Midtrans Server Status directly
+        $midtransStatus = $this->midtransService->checkTransactionStatus($order->order_number);
+
+        if (isset($midtransStatus['transaction_status'])) {
+            $ts = $midtransStatus['transaction_status'];
+
+            if (in_array($ts, ['settlement', 'capture'], true)) {
+                $this->midtransService->processOrderSettlement($order, $midtransStatus);
+
+                return response()->json([
+                    'status' => 'paid',
+                    'is_paid' => true,
+                    'paid_at' => $order->paid_at ? $order->paid_at->format('d M Y, H:i') . ' WIB' : now()->format('d M Y, H:i') . ' WIB',
+                    'message' => 'Pembayaran berhasil dikonfirmasi secara real-time!',
+                ]);
+            }
+
+            if ($ts === 'pending') {
+                return response()->json([
+                    'status' => 'pending',
+                    'is_paid' => false,
+                    'message' => 'Menunggu transfer / pembayaran dari pembeli.',
+                ]);
+            }
+
+            if (in_array($ts, ['expire', 'deny', 'cancel'], true)) {
+                $order->status = ($ts === 'expire') ? 'expired' : 'failed';
+                $order->save();
+
+                return response()->json([
+                    'status' => $order->status,
+                    'is_paid' => false,
+                    'message' => 'Transaksi kedaluwarsa atau dibatalkan.',
+                ]);
+            }
+        }
+
+        return response()->json([
+            'status' => $order->status,
+            'is_paid' => $order->status === 'paid',
+            'message' => 'Status pesanan saat ini: ' . $order->status,
+        ]);
+    }
+
+    /**
+     * Display order success & product download access page with real-time status check.
      */
     public function success(Request $request, string $orderNumber): Response
     {
@@ -208,8 +284,10 @@ class CheckoutController extends Controller
                 'fee' => $orderModel->payment_fee,
                 'total' => $orderModel->total,
                 'status' => $orderModel->status,
+                'snapToken' => $orderModel->snap_token,
+                'paymentUrl' => $orderModel->payment_url,
                 'licenseKey' => $access?->license_key,
-                'paidAt' => $orderModel->paid_at ? $orderModel->paid_at->format('d M Y, H:i') . ' WIB' : now()->format('d M Y, H:i') . ' WIB',
+                'paidAt' => $orderModel->paid_at ? $orderModel->paid_at->format('d M Y, H:i') . ' WIB' : ($orderModel->status === 'paid' ? now()->format('d M Y, H:i') . ' WIB' : null),
             ];
         } else {
             $order = session('order') ?? [
@@ -236,6 +314,27 @@ class CheckoutController extends Controller
 
         return Inertia::render('Public/Checkout/Success', [
             'order' => $order,
+            'midtransClientKey' => config('services.midtrans.client_key', env('MIDTRANS_CLIENT_KEY', '')),
+            'midtransSnapUrl' => config('services.midtrans.is_production', false)
+                ? 'https://app.midtrans.com/snap/snap.js'
+                : 'https://app.sandbox.midtrans.com/snap/snap.js',
         ]);
+    }
+
+    /**
+     * Download or stream official PDF Invoice receipt.
+     */
+    public function downloadInvoice(Request $request, string $orderNumber)
+    {
+        $order = Order::with(['items.product.category', 'accesses'])->where('order_number', $orderNumber)->firstOrFail();
+
+        if (class_exists(\Barryvdh\DomPDF\Facade\Pdf::class)) {
+            $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('invoices.receipt', compact('order'))
+                ->setPaper('a4', 'portrait');
+
+            return $pdf->download("KyySolutions-Invoice-{$order->order_number}.pdf");
+        }
+
+        return view('invoices.receipt', compact('order'));
     }
 }

@@ -30,7 +30,19 @@ import { useLanguage } from '@/Context/LanguageContext';
 import { useContactModal } from '@/Context/ContactModalContext';
 
 // Product Mockup Previews
-const ProductMockupPreview = ({ productId }) => {
+const ProductMockupPreview = ({ productId, thumbnail }) => {
+    if (thumbnail) {
+        return (
+            <div className="w-full aspect-video rounded-2xl overflow-hidden shadow-2xl border border-slate-800 bg-slate-950">
+                <img 
+                    src={thumbnail} 
+                    alt="Product Preview" 
+                    className="w-full h-full object-cover" 
+                />
+            </div>
+        );
+    }
+
     switch (productId) {
         case 1:
             return (
@@ -277,7 +289,7 @@ export default function ProductShow({ product, relatedProducts }) {
                                     )}
                                 </div>
 
-                                <ProductMockupPreview productId={product.id} />
+                                <ProductMockupPreview productId={product.id} thumbnail={product.thumbnail} />
                             </div>
 
                             {/* Tab Controls */}

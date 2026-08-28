@@ -174,13 +174,25 @@ export default function AdminOrdersIndex({ orders, counts, filters }) {
 
                                             {/* Actions */}
                                             <td className="py-3.5 px-4 text-right">
-                                                <button
-                                                    onClick={() => setSelectedOrder(ord)}
-                                                    className="px-2.5 py-1.5 rounded-lg bg-blue-50 hover:bg-blue-600 text-[#2563EB] hover:text-white text-xs font-bold transition-colors inline-flex items-center space-x-1 cursor-pointer"
-                                                >
-                                                    <Eye className="w-3.5 h-3.5" />
-                                                    <span>Detail</span>
-                                                </button>
+                                                <div className="flex items-center justify-end space-x-1">
+                                                    <a
+                                                        href={`/orders/${ord.orderNumber}/invoice`}
+                                                        target="_blank"
+                                                        rel="noreferrer"
+                                                        title="Unduh Invoice PDF"
+                                                        className="px-2 py-1.5 rounded-lg bg-slate-100 hover:bg-emerald-600 hover:text-white text-slate-700 text-xs font-bold transition-colors inline-flex items-center space-x-1 cursor-pointer"
+                                                    >
+                                                        <Download className="w-3.5 h-3.5" />
+                                                        <span className="hidden sm:inline">PDF</span>
+                                                    </a>
+                                                    <button
+                                                        onClick={() => setSelectedOrder(ord)}
+                                                        className="px-2.5 py-1.5 rounded-lg bg-blue-50 hover:bg-blue-600 text-[#2563EB] hover:text-white text-xs font-bold transition-colors inline-flex items-center space-x-1 cursor-pointer"
+                                                    >
+                                                        <Eye className="w-3.5 h-3.5" />
+                                                        <span>Detail</span>
+                                                    </button>
+                                                </div>
                                             </td>
 
                                         </tr>
@@ -273,10 +285,19 @@ export default function AdminOrdersIndex({ orders, counts, filters }) {
                                     </div>
                                 </div>
 
-                                <div className="pt-2 flex items-center justify-end space-x-2">
+                                <div className="pt-2 flex items-center justify-between space-x-2">
+                                    <a
+                                        href={`/orders/${selectedOrder.orderNumber}/invoice`}
+                                        target="_blank"
+                                        rel="noreferrer"
+                                        className="px-4 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold transition-colors inline-flex items-center space-x-1.5"
+                                    >
+                                        <Download className="w-4 h-4" />
+                                        <span>Unduh Invoice PDF</span>
+                                    </a>
                                     <button
                                         onClick={() => setSelectedOrder(null)}
-                                        className="w-full py-2.5 rounded-xl bg-[#2563EB] hover:bg-[#1D4ED8] text-white font-bold transition-colors cursor-pointer"
+                                        className="px-5 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold transition-colors cursor-pointer"
                                     >
                                         Tutup
                                     </button>

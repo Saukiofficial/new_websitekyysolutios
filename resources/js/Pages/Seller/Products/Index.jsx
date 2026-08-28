@@ -17,6 +17,7 @@ import {
     CheckCircle2
 } from 'lucide-react';
 import SellerLayout from '@/Layouts/SellerLayout';
+import ImageUploadInput from '@/Components/Shared/ImageUploadInput';
 
 export default function SellerProductsIndex({ products = [], categories = [], store = {} }) {
     const [searchTerm, setSearchTerm] = useState('');
@@ -29,6 +30,8 @@ export default function SellerProductsIndex({ products = [], categories = [], st
         extended_price: '',
         version: 'v1.0.0',
         badge: 'New Release',
+        thumbnail: null,
+        thumbnail_url: '',
         short_description: '',
         delivery_type: 'gdrive',
         delivery_url: '',
@@ -293,6 +296,16 @@ export default function SellerProductsIndex({ products = [], categories = [], st
                                         className="w-full p-3 rounded-xl border border-slate-200 focus:outline-none focus:border-blue-500"
                                     />
                                 </div>
+
+                                <ImageUploadInput
+                                    label="Thumbnail / Mockup Preview Software"
+                                    recommendedText="1200 × 675 px (Rasio 16:9), Maks 3MB"
+                                    aspectRatio="aspect-video"
+                                    value={data.thumbnail_url}
+                                    onChangeFile={(file) => setData('thumbnail', file)}
+                                    onChangeUrl={(url) => setData('thumbnail_url', url)}
+                                    error={errors.thumbnail || errors.thumbnail_url}
+                                />
 
                                 {/* Delivery Method Selector (Google Drive / GitHub) */}
                                 <div className="p-4 bg-slate-50 border border-slate-200 rounded-2xl space-y-3">

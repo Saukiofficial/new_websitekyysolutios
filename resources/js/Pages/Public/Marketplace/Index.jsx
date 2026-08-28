@@ -203,6 +203,45 @@ const AIPlatformPreview = () => (
     </div>
 );
 
+// Generic Product Fallback Preview Component
+const GenericPreview = ({ title = 'Source Code', tech = [] }) => (
+    <div className="w-full h-full bg-[#0F172A] p-3 text-white flex flex-col justify-between select-none relative overflow-hidden">
+        <div className="flex items-center justify-between pb-2 border-b border-slate-800 text-[9px] text-slate-400">
+            <div className="flex items-center space-x-1">
+                <div className="w-2 h-2 rounded-full bg-red-500/80" />
+                <div className="w-2 h-2 rounded-full bg-amber-500/80" />
+                <div className="w-2 h-2 rounded-full bg-emerald-500/80" />
+            </div>
+            <span className="font-mono text-[8px] bg-slate-800/80 px-2 py-0.5 rounded text-blue-400">production_ready.zip</span>
+        </div>
+        <div className="py-2 space-y-1.5 font-mono text-[9px]">
+            <div className="text-emerald-400 flex items-center space-x-1">
+                <span className="text-slate-500">&gt;</span>
+                <span className="truncate">{title}</span>
+            </div>
+            <div className="text-slate-400 text-[8px] flex items-center space-x-1">
+                <span className="text-purple-400">import</span>
+                <span>{'{'} CleanArchitecture {'}'}</span>
+                <span className="text-purple-400">from</span>
+                <span className="text-amber-300">'@kyy/core'</span>
+            </div>
+        </div>
+        <div className="pt-1.5 flex items-center justify-between text-[8px] text-slate-400 border-t border-slate-800">
+            <span className="text-slate-300 font-semibold">{Array.isArray(tech) && tech.length > 0 ? tech.slice(0, 2).join(' • ') : 'Fullstack'}</span>
+            <span className="text-emerald-400 font-bold">Verified Build</span>
+        </div>
+    </div>
+);
+
+const previewMap = {
+    'saas-multi-tenant-starter': SaaSPreview,
+    'ecommerce-pos-terminal-kit': EcommercePreview,
+    'fintech-mobile-banking-app': FintechPreview,
+    'enterprise-design-system-ui-kit': UIComponentsPreview,
+    'modern-crm-sales-pipeline': CRMPreview,
+    'ai-prompt-chatbot-engine': AIPlatformPreview,
+};
+
 // Custom Checkbox Component
 const CustomCheckbox = ({ checked, onChange, label, count }) => (
     <label 
@@ -233,7 +272,7 @@ const CustomCheckbox = ({ checked, onChange, label, count }) => (
     </label>
 );
 
-export default function MarketplaceIndex({ initialCategory = 'all', searchQuery = '' }) {
+export default function MarketplaceIndex({ initialCategory = 'all', searchQuery = '', dbProducts = [], dbCategories = [] }) {
     const { t, lang } = useLanguage();
     const mp = t.marketplacePage || {};
     
@@ -243,7 +282,7 @@ export default function MarketplaceIndex({ initialCategory = 'all', searchQuery 
     const [sortBy, setSortBy] = useState('featured');
     
     // Multi-Select Filter States
-    const [selectedCategories, setSelectedCategories] = useState(['all']);
+    const [selectedCategories, setSelectedCategories] = useState(initialCategory !== 'all' ? [initialCategory] : ['all']);
     const [selectedLicenses, setSelectedLicenses] = useState(['all']);
     const [selectedPrices, setSelectedPrices] = useState(['all']);
     
@@ -271,16 +310,37 @@ export default function MarketplaceIndex({ initialCategory = 'all', searchQuery 
         });
     };
 
-    // Filter Options mapped dynamically to active language
-    const categoryOptions = [
-        { id: 'all', label: mp.categories?.all || (lang === 'ID' ? 'Semua Produk' : 'All Products') },
-        { id: 'saasSystems', label: mp.categories?.saasSystems || (lang === 'ID' ? 'Sistem SaaS' : 'SaaS Systems') },
-        { id: 'sourceCode', label: mp.categories?.sourceCode || 'Source Code' },
-        { id: 'mobileApps', label: mp.categories?.mobileApps || (lang === 'ID' ? 'Aplikasi Mobile' : 'Mobile Apps') },
-        { id: 'uiKits', label: mp.categories?.uiKits || 'UI Kits' },
-        { id: 'templates', label: mp.categories?.templates || (lang === 'ID' ? 'Template Web' : 'Web Templates') },
-        { id: 'plugins', label: mp.categories?.plugins || 'Plugins & APIs' },
-    ];
+    // Filter Options mapped dynamically to active language & database categories
+    const categoryOptions = useMemo(() => {
+        if (dbCategories && dbCategories.length > 0) {
+            const list = [
+                { id: 'all', label: mp.categories?.all || (lang === 'ID' ? 'Semua Produk' : 'All Products') },
+                ...dbCategories.map(c => ({
+                    id: c.id,
+                    label: mp.categories?.[c.id] || c.name,
+                }))
+            ];
+            const unique = [];
+            const seen = new Set();
+            for (const item of list) {
+                if (!seen.has(item.id)) {
+                    seen.add(item.id);
+                    unique.push(item);
+                }
+            }
+            return unique;
+        }
+
+        return [
+            { id: 'all', label: mp.categories?.all || (lang === 'ID' ? 'Semua Produk' : 'All Products') },
+            { id: 'saasSystems', label: mp.categories?.saasSystems || (lang === 'ID' ? 'Sistem SaaS' : 'SaaS Systems') },
+            { id: 'sourceCode', label: mp.categories?.sourceCode || 'Source Code' },
+            { id: 'mobileApps', label: mp.categories?.mobileApps || (lang === 'ID' ? 'Aplikasi Mobile' : 'Mobile Apps') },
+            { id: 'uiKits', label: mp.categories?.uiKits || 'UI Kits' },
+            { id: 'templates', label: mp.categories?.templates || (lang === 'ID' ? 'Template Web' : 'Web Templates') },
+            { id: 'plugins', label: mp.categories?.plugins || 'Plugins & APIs' },
+        ];
+    }, [dbCategories, lang, mp]);
 
     const licenseOptions = [
         { id: 'all', label: mp.licenses?.all || (lang === 'ID' ? 'Semua Lisensi' : 'All License') },
@@ -296,160 +356,194 @@ export default function MarketplaceIndex({ initialCategory = 'all', searchQuery 
         { id: 'above1000', label: mp.priceRanges?.above1000 || 'Rp 1.000.000+', min: 1000000, max: Infinity },
     ];
 
-    // Master Product Catalog
-    const catalog = useMemo(() => [
-        {
-            id: 1,
-            slug: 'saas-multi-tenant-starter',
-            title: 'SaaS Multi-Tenant Boilerplate Starter',
-            categoryKey: 'saasSystems',
-            categoryName: mp.categories?.saasSystems || (lang === 'ID' ? 'Sistem SaaS' : 'SaaS Systems'),
-            licenseType: 'regular',
-            description: lang === 'ID' 
-                ? 'Starter pack SaaS lengkap dengan database multi-tenancy, Stripe billing subscription, role & permission, auth dan tim.'
-                : 'Production-ready SaaS starter with database multi-tenancy, Stripe billing subscriptions, roles, permissions, auth & teams.',
-            price: 650000,
-            priceFormatted: 'Rp 650.000',
-            rating: 4.9,
-            reviews: 38,
-            sales: 142,
-            badge: lang === 'ID' ? 'Terlaris' : 'Best Seller',
-            tech: ['Laravel 13', 'React 19', 'Inertia.js', 'Stripe', 'MySQL'],
-            previewComponent: SaaSPreview,
-            features: [
-                lang === 'ID' ? 'Isolasi database multi-tenant otomatis' : 'Multi-tenant database tenancy isolation',
-                lang === 'ID' ? 'Stripe Customer Portal & webhook langganan' : 'Stripe Customer Portal & automated webhooks',
-                lang === 'ID' ? 'Engine tema Dark Mode & Light Mode' : 'Dark mode & Light mode theme engine',
-                lang === 'ID' ? 'Role-based permission & audit log sistem' : 'Role-based permissions & audit logs',
-                lang === 'ID' ? 'Gratis pembaruan seumur hidup & dokumentasi' : 'Lifetime free updates & documentation'
-            ]
-        },
-        {
-            id: 2,
-            slug: 'ecommerce-pos-terminal-kit',
-            title: 'E-Commerce Admin & Live POS Terminal Kit',
-            categoryKey: 'sourceCode',
-            categoryName: mp.categories?.sourceCode || 'Source Code',
-            licenseType: 'regular',
-            description: lang === 'ID'
-                ? 'Backend e-commerce lengkap dengan terminal kasir POS live, stok inventory sinkron, faktur PDF, kupon dan payment gateway.'
-                : 'Complete e-commerce backend with live offline-first POS terminal, live inventory, PDF invoices, discounts & payment gateway.',
-            price: 450000,
-            priceFormatted: 'Rp 450.000',
-            rating: 4.8,
-            reviews: 24,
-            sales: 98,
-            badge: lang === 'ID' ? 'Unggulan' : 'Featured',
-            tech: ['Laravel', 'Vue 3 / React', 'Tailwind CSS', 'Midtrans'],
-            previewComponent: EcommercePreview,
-            features: [
-                lang === 'ID' ? 'Integrasi printer struk thermal' : 'Thermal receipt printer integration',
-                lang === 'ID' ? 'Sinkronisasi inventaris multi-cabang' : 'Multi-branch stock inventory sync',
-                lang === 'ID' ? 'Notifikasi pesanan WhatsApp otomatis' : 'Automated WhatsApp order notifications',
-                lang === 'ID' ? 'Laporan analisis penjualan lengkap' : 'Complete sales analytics reports'
-            ]
-        },
-        {
-            id: 3,
-            slug: 'fintech-mobile-banking-app',
-            title: 'Fintech Mobile Banking App Template',
-            categoryKey: 'mobileApps',
-            categoryName: mp.categories?.mobileApps || (lang === 'ID' ? 'Aplikasi Mobile' : 'Mobile Apps'),
-            licenseType: 'extended',
-            description: lang === 'ID'
-                ? 'Template aplikasi dompet digital mobile dengan pembayaran QRIS, transfer saldo, kartu virtual & riwayat transaksi realtime.'
-                : 'Cross-platform mobile wallet template with QR payments, balance transfers, virtual cards & real-time transaction feed.',
-            price: 550000,
-            priceFormatted: 'Rp 550.000',
-            rating: 4.9,
-            reviews: 19,
-            sales: 76,
-            badge: lang === 'ID' ? 'Populer' : 'Popular',
-            tech: ['Flutter 3', 'Node.js', 'PostgreSQL', 'Firebase'],
-            previewComponent: FintechPreview,
-            features: [
-                lang === 'ID' ? 'Autentikasi biometrik FaceID & Sidik Jari' : 'Biometric FaceID & Fingerprint auth',
-                lang === 'ID' ? 'Generator kartu debit virtual' : 'Virtual debit card generator',
-                lang === 'ID' ? 'Scanner kode QRIS & barcode' : 'QRIS / QR Code scanner',
-                lang === 'ID' ? 'Push notifikasi instan dengan FCM' : 'Push notifications with FCM'
-            ]
-        },
-        {
-            id: 4,
-            slug: 'enterprise-design-system-ui-kit',
-            title: 'Enterprise Design System & UI Component Kit',
-            categoryKey: 'uiKits',
-            categoryName: mp.categories?.uiKits || 'UI Kits',
-            licenseType: 'regular',
-            description: lang === 'ID'
-                ? 'Lebih dari 200+ komponen modern, token desain dark mode, validasi input formulir, dan layout blok responsif.'
-                : 'Over 200+ accessible components, dark mode design tokens, form validation inputs, and responsive layout blocks.',
-            price: 350000,
-            priceFormatted: 'Rp 350.000',
-            rating: 5.0,
-            reviews: 42,
-            sales: 210,
-            badge: lang === 'ID' ? 'Rating Tertinggi' : 'Top Rated',
-            tech: ['Figma', 'Tailwind CSS', 'React 19', 'TypeScript'],
-            previewComponent: UIComponentsPreview,
-            features: [
-                lang === 'ID' ? 'File sumber Figma Auto-layout 5.0' : 'Auto-layout 5.0 Figma source file',
-                lang === 'ID' ? 'Token desain standar WCAG 2.1' : 'Accessible WCAG 2.1 compliant tokens',
-                lang === 'ID' ? 'Komponen siap salin React & Tailwind' : 'Copy-paste React & Tailwind components',
-                lang === 'ID' ? 'Dokumentasi interaktif Storybook' : 'Comprehensive interactive Storybook'
-            ]
-        },
-        {
-            id: 5,
-            slug: 'modern-crm-sales-pipeline',
-            title: 'Modern CRM & Sales Pipeline Management',
-            categoryKey: 'saasSystems',
-            categoryName: mp.categories?.saasSystems || (lang === 'ID' ? 'Sistem SaaS' : 'SaaS Systems'),
-            licenseType: 'extended',
-            description: lang === 'ID'
-                ? 'Aplikasi CRM lengkap dengan Kanban deal pipeline drag-and-drop, otomasi email follow-up, dan integrasi WhatsApp API.'
-                : 'Full-featured CRM with drag-and-drop Kanban pipeline, automated email campaigns, lead tracking & WhatsApp API.',
-            price: 590000,
-            priceFormatted: 'Rp 590.000',
-            rating: 4.8,
-            reviews: 16,
-            sales: 54,
-            badge: lang === 'ID' ? 'Rilis Baru' : 'New Release',
-            tech: ['Laravel 13', 'React', 'Tailwind', 'Pusher'],
-            previewComponent: CRMPreview,
-            features: [
-                lang === 'ID' ? 'Tahapan deal penjualan sistem Kanban' : 'Kanban sales deal stages',
-                lang === 'ID' ? 'Otomasi pesan follow-up pelanggan' : 'Automated customer follow-ups',
-                lang === 'ID' ? 'Pelacakan open-rate email & klik' : 'Email open rate & link tracking',
-                lang === 'ID' ? 'Manajemen peran & hak akses pengguna' : 'Role-based permissions'
-            ]
-        },
-        {
-            id: 6,
-            slug: 'ai-prompt-chatbot-engine',
-            title: 'AI Multi-Model Prompt & Chatbot Engine',
-            categoryKey: 'plugins',
-            categoryName: mp.categories?.plugins || 'Plugins & APIs',
-            licenseType: 'regular',
-            description: lang === 'ID'
-                ? 'Backend integrasi AI multimodal & frontend streaming respons untuk OpenAI GPT-4o, Claude 3.5, dan Google Gemini.'
-                : 'Multimodal AI integration backend & streaming frontend for OpenAI GPT-4o, Claude 3.5, and Google Gemini with token metering.',
-            price: 490000,
-            priceFormatted: 'Rp 490.000',
-            rating: 4.9,
-            reviews: 29,
-            sales: 118,
-            badge: lang === 'ID' ? 'Unggulan' : 'Featured',
-            tech: ['Node.js / Python', 'React', 'Vector DB', 'OpenAI'],
-            previewComponent: AIPlatformPreview,
-            features: [
-                lang === 'ID' ? 'Renderer streaming token real-time' : 'Token streaming response renderer',
-                lang === 'ID' ? 'Indexing dokumen vektor RAG' : 'RAG document vector indexing',
-                lang === 'ID' ? 'Gateway API pengganti model instan' : 'Model switcher API gateway',
-                lang === 'ID' ? 'Pengukuran kuota token & rate limit' : 'Token usage metering & rate limiting'
-            ]
+    // Master Product Catalog connected to MySQL dbProducts
+    const catalog = useMemo(() => {
+        if (dbProducts && dbProducts.length > 0) {
+            return dbProducts.map(p => {
+                const PreviewComp = previewMap[p.slug] || (() => <GenericPreview title={p.title} tech={p.tech} />);
+                return {
+                    id: p.id,
+                    slug: p.slug,
+                    title: p.title,
+                    categoryKey: p.categoryKey || 'sourceCode',
+                    categoryName: p.categoryName || 'Source Code',
+                    licenseType: p.licenseType || 'regular',
+                    description: p.description || '',
+                    price: p.price,
+                    priceFormatted: p.priceFormatted || ('Rp ' + Number(p.price).toLocaleString('id-ID')),
+                    rating: p.rating || 5.0,
+                    reviews: p.reviews || 0,
+                    sales: p.sales || 0,
+                    badge: p.badge || 'Unggulan',
+                    tech: Array.isArray(p.tech) ? p.tech : ['Laravel', 'React'],
+                    previewComponent: PreviewComp,
+                    features: Array.isArray(p.features) ? p.features : [
+                        'Dokumentasi instalasi lengkap',
+                        'Source code bersih terorganisir',
+                        'Gratis update versi berkala',
+                    ],
+                    thumbnail: p.thumbnail,
+                    demoUrl: p.demoUrl,
+                    version: p.version || 'v1.0.0',
+                    store: p.store || { name: 'KyySolutions Official', verified: true },
+                };
+            });
         }
-    ], [lang, mp]);
+
+        return [
+            {
+                id: 1,
+                slug: 'saas-multi-tenant-starter',
+                title: 'SaaS Multi-Tenant Boilerplate Starter',
+                categoryKey: 'saasSystems',
+                categoryName: mp.categories?.saasSystems || (lang === 'ID' ? 'Sistem SaaS' : 'SaaS Systems'),
+                licenseType: 'regular',
+                description: lang === 'ID' 
+                    ? 'Starter pack SaaS lengkap dengan database multi-tenancy, Stripe billing subscription, role & permission, auth dan tim.'
+                    : 'Production-ready SaaS starter with database multi-tenancy, Stripe billing subscriptions, roles, permissions, auth & teams.',
+                price: 650000,
+                priceFormatted: 'Rp 650.000',
+                rating: 4.9,
+                reviews: 38,
+                sales: 142,
+                badge: lang === 'ID' ? 'Terlaris' : 'Best Seller',
+                tech: ['Laravel 13', 'React 19', 'Inertia.js', 'Stripe', 'MySQL'],
+                previewComponent: SaaSPreview,
+                features: [
+                    lang === 'ID' ? 'Isolasi database multi-tenant otomatis' : 'Multi-tenant database tenancy isolation',
+                    lang === 'ID' ? 'Stripe Customer Portal & webhook langganan' : 'Stripe Customer Portal & automated webhooks',
+                    lang === 'ID' ? 'Engine tema Dark Mode & Light Mode' : 'Dark mode & Light mode theme engine',
+                    lang === 'ID' ? 'Role-based permission & audit log sistem' : 'Role-based permissions & audit logs',
+                    lang === 'ID' ? 'Gratis pembaruan seumur hidup & dokumentasi' : 'Lifetime free updates & documentation'
+                ]
+            },
+            {
+                id: 2,
+                slug: 'ecommerce-pos-terminal-kit',
+                title: 'E-Commerce Admin & Live POS Terminal Kit',
+                categoryKey: 'sourceCode',
+                categoryName: mp.categories?.sourceCode || 'Source Code',
+                licenseType: 'regular',
+                description: lang === 'ID'
+                    ? 'Backend e-commerce lengkap dengan terminal kasir POS live, stok inventory sinkron, faktur PDF, kupon dan payment gateway.'
+                    : 'Complete e-commerce backend with live offline-first POS terminal, live inventory, PDF invoices, discounts & payment gateway.',
+                price: 450000,
+                priceFormatted: 'Rp 450.000',
+                rating: 4.8,
+                reviews: 24,
+                sales: 98,
+                badge: lang === 'ID' ? 'Unggulan' : 'Featured',
+                tech: ['Laravel', 'Vue 3 / React', 'Tailwind CSS', 'Midtrans'],
+                previewComponent: EcommercePreview,
+                features: [
+                    lang === 'ID' ? 'Integrasi printer struk thermal' : 'Thermal receipt printer integration',
+                    lang === 'ID' ? 'Sinkronisasi inventaris multi-cabang' : 'Multi-branch stock inventory sync',
+                    lang === 'ID' ? 'Notifikasi pesanan WhatsApp otomatis' : 'Automated WhatsApp order notifications',
+                    lang === 'ID' ? 'Laporan analisis penjualan lengkap' : 'Complete sales analytics reports'
+                ]
+            },
+            {
+                id: 3,
+                slug: 'fintech-mobile-banking-app',
+                title: 'Fintech Mobile Banking App Template',
+                categoryKey: 'mobileApps',
+                categoryName: mp.categories?.mobileApps || (lang === 'ID' ? 'Aplikasi Mobile' : 'Mobile Apps'),
+                licenseType: 'extended',
+                description: lang === 'ID'
+                    ? 'Template aplikasi dompet digital mobile dengan pembayaran QRIS, transfer saldo, kartu virtual & riwayat transaksi realtime.'
+                    : 'Cross-platform mobile wallet template with QR payments, balance transfers, virtual cards & real-time transaction feed.',
+                price: 550000,
+                priceFormatted: 'Rp 550.000',
+                rating: 4.9,
+                reviews: 19,
+                sales: 76,
+                badge: lang === 'ID' ? 'Populer' : 'Popular',
+                tech: ['Flutter 3', 'Node.js', 'PostgreSQL', 'Firebase'],
+                previewComponent: FintechPreview,
+                features: [
+                    lang === 'ID' ? 'Autentikasi biometrik FaceID & Sidik Jari' : 'Biometric FaceID & Fingerprint auth',
+                    lang === 'ID' ? 'Generator kartu debit virtual' : 'Virtual debit card generator',
+                    lang === 'ID' ? 'Scanner kode QRIS & barcode' : 'QRIS / QR Code scanner',
+                    lang === 'ID' ? 'Push notifikasi instan dengan FCM' : 'Push notifications with FCM'
+                ]
+            },
+            {
+                id: 4,
+                slug: 'enterprise-design-system-ui-kit',
+                title: 'Enterprise Design System & UI Component Kit',
+                categoryKey: 'uiKits',
+                categoryName: mp.categories?.uiKits || 'UI Kits',
+                licenseType: 'regular',
+                description: lang === 'ID'
+                    ? 'Lebih dari 200+ komponen modern, token desain dark mode, validasi input formulir, dan layout blok responsif.'
+                    : 'Over 200+ accessible components, dark mode design tokens, form validation inputs, and responsive layout blocks.',
+                price: 350000,
+                priceFormatted: 'Rp 350.000',
+                rating: 5.0,
+                reviews: 42,
+                sales: 210,
+                badge: lang === 'ID' ? 'Rating Tertinggi' : 'Top Rated',
+                tech: ['Figma', 'Tailwind CSS', 'React 19', 'TypeScript'],
+                previewComponent: UIComponentsPreview,
+                features: [
+                    lang === 'ID' ? 'File sumber Figma Auto-layout 5.0' : 'Auto-layout 5.0 Figma source file',
+                    lang === 'ID' ? 'Token desain standar WCAG 2.1' : 'Accessible WCAG 2.1 compliant tokens',
+                    lang === 'ID' ? 'Komponen siap salin React & Tailwind' : 'Copy-paste React & Tailwind components',
+                    lang === 'ID' ? 'Dokumentasi interaktif Storybook' : 'Comprehensive interactive Storybook'
+                ]
+            },
+            {
+                id: 5,
+                slug: 'modern-crm-sales-pipeline',
+                title: 'Modern CRM & Sales Pipeline Management',
+                categoryKey: 'saasSystems',
+                categoryName: mp.categories?.saasSystems || (lang === 'ID' ? 'Sistem SaaS' : 'SaaS Systems'),
+                licenseType: 'extended',
+                description: lang === 'ID'
+                    ? 'Aplikasi CRM lengkap dengan Kanban deal pipeline drag-and-drop, otomasi email follow-up, dan integrasi WhatsApp API.'
+                    : 'Full-featured CRM with drag-and-drop Kanban pipeline, automated email campaigns, lead tracking & WhatsApp API.',
+                price: 590000,
+                priceFormatted: 'Rp 590.000',
+                rating: 4.8,
+                reviews: 16,
+                sales: 54,
+                badge: lang === 'ID' ? 'Rilis Baru' : 'New Release',
+                tech: ['Laravel 13', 'React', 'Tailwind', 'Pusher'],
+                previewComponent: CRMPreview,
+                features: [
+                    lang === 'ID' ? 'Tahapan deal penjualan sistem Kanban' : 'Kanban sales deal stages',
+                    lang === 'ID' ? 'Otomasi pesan follow-up pelanggan' : 'Automated customer follow-ups',
+                    lang === 'ID' ? 'Pelacakan open-rate email & klik' : 'Email open rate & link tracking',
+                    lang === 'ID' ? 'Manajemen peran & hak akses pengguna' : 'Role-based permissions'
+                ]
+            },
+            {
+                id: 6,
+                slug: 'ai-prompt-chatbot-engine',
+                title: 'AI Multi-Model Prompt & Chatbot Engine',
+                categoryKey: 'plugins',
+                categoryName: mp.categories?.plugins || 'Plugins & APIs',
+                licenseType: 'regular',
+                description: lang === 'ID'
+                    ? 'Backend integrasi AI multimodal & frontend streaming respons untuk OpenAI GPT-4o, Claude 3.5, dan Google Gemini.'
+                    : 'Multimodal AI integration backend & streaming frontend for OpenAI GPT-4o, Claude 3.5, and Google Gemini with token metering.',
+                price: 490000,
+                priceFormatted: 'Rp 490.000',
+                rating: 4.9,
+                reviews: 29,
+                sales: 118,
+                badge: lang === 'ID' ? 'Unggulan' : 'Featured',
+                tech: ['Node.js / Python', 'React', 'Vector DB', 'OpenAI'],
+                previewComponent: AIPlatformPreview,
+                features: [
+                    lang === 'ID' ? 'Renderer streaming token real-time' : 'Token streaming response renderer',
+                    lang === 'ID' ? 'Indexing dokumen vektor RAG' : 'RAG document vector indexing',
+                    lang === 'ID' ? 'Gateway API pengganti model instan' : 'Model switcher API gateway',
+                    lang === 'ID' ? 'Pengukuran kuota token & rate limit' : 'Token usage metering & rate limiting'
+                ]
+            }
+        ];
+    }, [dbProducts, lang, mp]);
 
     // Toggle Handler for Multi-Select Checkboxes
     const handleCategoryToggle = (id) => {
@@ -828,9 +922,19 @@ export default function MarketplaceIndex({ initialCategory = 'all', searchQuery 
                                                 className="rounded-[16px] bg-white border border-[#E5EAF2] hover:border-[#2563EB]/40 shadow-xs hover:shadow-md transition-all duration-200 overflow-hidden flex flex-col justify-between group"
                                             >
                                                 <div>
-                                                    {/* Header Mockup Preview */}
+                                                    {/* Header Mockup Preview / Image Thumbnail */}
                                                     <div className="h-44 w-full relative overflow-hidden bg-slate-900 border-b border-[#E5EAF2]">
-                                                        {PreviewComponent && <PreviewComponent />}
+                                                        {product.thumbnail ? (
+                                                            <img 
+                                                                src={product.thumbnail} 
+                                                                alt={product.title} 
+                                                                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" 
+                                                            />
+                                                        ) : PreviewComponent ? (
+                                                            <PreviewComponent />
+                                                        ) : (
+                                                            <GenericPreview title={product.title} category={product.categoryName} />
+                                                        )}
 
                                                         {/* Top Badges & Wishlist */}
                                                         <div className="absolute top-2.5 left-2.5 right-2.5 flex items-center justify-between z-10">

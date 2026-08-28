@@ -276,9 +276,21 @@ export default function PortfolioSection() {
                                 <div className="h-full flex flex-col justify-between rounded-[22px] bg-white border border-slate-200/80 hover:border-[#2563EB]/50 shadow-[0_4px_20px_rgba(20,33,61,0.04)] hover:shadow-[0_15px_35px_rgba(37,99,235,0.12)] hover:-translate-y-1 transition-all duration-300 overflow-hidden group">
                                     
                                     <div>
-                                        {/* Realistic UI Mockup Header */}
+                                        {/* Realistic UI Mockup / Banner Image Header */}
                                         <div className="h-48 w-full relative overflow-hidden bg-slate-900 border-b border-slate-100">
-                                            {MockupComponent && <MockupComponent />}
+                                            {project.banner_image || project.image ? (
+                                                <img 
+                                                    src={project.banner_image || project.image} 
+                                                    alt={project.title} 
+                                                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" 
+                                                />
+                                            ) : MockupComponent ? (
+                                                <MockupComponent />
+                                            ) : (
+                                                <div className="w-full h-full flex items-center justify-center bg-slate-800 text-slate-400">
+                                                    <span className="text-xs font-mono font-bold">{project.title}</span>
+                                                </div>
+                                            )}
 
                                             {/* Key Metric Floating Badge */}
                                             <div className="absolute top-3 right-3 bg-white/95 backdrop-blur-md text-[#14213D] text-[11px] font-black px-3 py-1 rounded-full shadow-md border border-slate-100 flex items-center space-x-1">

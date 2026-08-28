@@ -306,9 +306,21 @@ export default function MarketplacePreview() {
                                     <div className="h-full flex flex-col justify-between rounded-[20px] bg-white border border-slate-200/85 hover:border-[#2563EB]/50 shadow-[0_4px_20px_rgba(20,33,61,0.04)] hover:shadow-[0_14px_35px_rgba(37,99,235,0.12)] hover:-translate-y-1 transition-all duration-300 overflow-hidden group">
                                         
                                         <div>
-                                            {/* Realistic UI Mockup Header Box */}
+                                            {/* Realistic UI Mockup / Thumbnail Header Box */}
                                             <div className="h-44 w-full relative overflow-hidden bg-slate-900 border-b border-slate-100">
-                                                {PreviewComponent && <PreviewComponent />}
+                                                {product.thumbnail ? (
+                                                    <img 
+                                                        src={product.thumbnail} 
+                                                        alt={product.title} 
+                                                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" 
+                                                    />
+                                                ) : PreviewComponent ? (
+                                                    <PreviewComponent />
+                                                ) : (
+                                                    <div className="w-full h-full flex items-center justify-center bg-slate-800 text-slate-400">
+                                                        <span className="text-xs font-mono font-bold">{product.title}</span>
+                                                    </div>
+                                                )}
 
                                                 {/* Official Badge Pill */}
                                                 <div className="absolute top-3 left-3 bg-white/95 backdrop-blur-md text-[#14213D] text-[10px] font-extrabold px-2.5 py-0.5 rounded-full shadow-md border border-slate-100">
