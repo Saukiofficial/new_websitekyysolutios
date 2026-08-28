@@ -27,7 +27,8 @@ export default function CheckoutIndex({ product, productId }) {
 
     const [paymentMethod, setPaymentMethod] = useState('qris');
     const [couponCode, setCouponCode] = useState('');
-    const [appliedDiscount, setAppliedDiscount] = useState(0);
+    const [appliedCoupon, setAppliedCoupon] = useState(null);
+    const [isApplyingCoupon, setIsApplyingCoupon] = useState(false);
     const [couponMessage, setCouponMessage] = useState('');
     const [couponError, setCouponError] = useState('');
 
@@ -43,6 +44,7 @@ export default function CheckoutIndex({ product, productId }) {
         email: '',
         phone: '',
         payment_method: 'qris',
+        coupon_code: '',
         agree_terms: false,
     });
 
@@ -87,23 +89,55 @@ export default function CheckoutIndex({ product, productId }) {
 
     const currentFee = paymentOptions.find(p => p.id === paymentMethod)?.fee || 0;
     const basePrice = product?.price || 650000;
-    const discountAmount = appliedDiscount > 0 ? (basePrice * appliedDiscount) / 100 : 0;
-    const totalPrice = basePrice - discountAmount + currentFee;
+    const discountAmount = appliedCoupon?.discountAmount || 0;
+    const totalPrice = Math.max(0, basePrice - discountAmount) + currentFee;
 
-    const handleApplyCoupon = (e) => {
-        e.preventDefault();
+    const handleApplyCoupon = async (e) => {
+        if (e) e.preventDefault();
+        const code = couponCode.trim().toUpperCase();
+        if (!code) return;
+
+        setIsApplyingCoupon(true);
         setCouponError('');
         setCouponMessage('');
-        
-        if (couponCode.toUpperCase() === 'KYYSPECIAL') {
-            setAppliedDiscount(10);
-            setCouponMessage(lang === 'ID' ? 'Kupon KYYSPECIAL diterapkan: Diskon 10%!' : 'Coupon KYYSPECIAL applied: 10% OFF!');
-        } else if (couponCode.toUpperCase() === 'LAUNCH50') {
-            setAppliedDiscount(15);
-            setCouponMessage(lang === 'ID' ? 'Kupon LAUNCH50 diterapkan: Diskon 15%!' : 'Coupon LAUNCH50 applied: 15% OFF!');
-        } else {
-            setCouponError(lang === 'ID' ? 'Kode voucher tidak valid atau sudah kedaluwarsa.' : 'Invalid or expired coupon code.');
+
+        try {
+            const res = await fetch('/api/coupons/validate', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json',
+                },
+                body: JSON.stringify({
+                    code: code,
+                    subtotal: basePrice,
+                }),
+            });
+
+            const result = await res.json();
+
+            if (res.ok && result.valid && result.coupon) {
+                setAppliedCoupon(result.coupon);
+                setData('coupon_code', result.coupon.code);
+                setCouponMessage(result.message || (lang === 'ID' ? 'Kupon promo berhasil diterapkan!' : 'Coupon promo applied successfully!'));
+            } else {
+                setAppliedCoupon(null);
+                setData('coupon_code', '');
+                setCouponError(result.message || (lang === 'ID' ? 'Kode voucher tidak valid atau sudah kedaluwarsa.' : 'Invalid or expired coupon code.'));
+            }
+        } catch (err) {
+            setCouponError(lang === 'ID' ? 'Gagal memeriksa kode voucher.' : 'Failed to validate coupon.');
+        } finally {
+            setIsApplyingCoupon(false);
         }
+    };
+
+    const handleRemoveCoupon = () => {
+        setAppliedCoupon(null);
+        setCouponCode('');
+        setData('coupon_code', '');
+        setCouponMessage('');
+        setCouponError('');
     };
 
     const handlePaymentMethodSelect = (id) => {
@@ -352,23 +386,49 @@ export default function CheckoutIndex({ product, productId }) {
                                             <Tag className="w-3.5 h-3.5 mr-1 text-[#2563EB]" />
                                             <span>{lang === 'ID' ? 'Punya Kode Promo / Voucher?' : 'Have a Promo / Voucher Code?'}</span>
                                         </label>
-                                        <div className="flex space-x-2">
-                                            <input
-                                                type="text"
-                                                value={couponCode}
-                                                onChange={(e) => setCouponCode(e.target.value)}
-                                                placeholder="cth: KYYSPECIAL"
-                                                className="w-full h-10 px-3 text-xs uppercase rounded-xl border border-slate-200 focus:outline-none focus:border-[#2563EB]"
-                                            />
-                                            <button
-                                                type="button"
-                                                onClick={handleApplyCoupon}
-                                                className="px-4 h-10 rounded-xl bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold transition-colors cursor-pointer shrink-0"
-                                            >
-                                                {lang === 'ID' ? 'Pakai' : 'Apply'}
-                                            </button>
-                                        </div>
-                                        {couponMessage && (
+                                        
+                                        {!appliedCoupon ? (
+                                            <div className="flex space-x-2">
+                                                <input
+                                                    type="text"
+                                                    value={couponCode}
+                                                    onChange={(e) => setCouponCode(e.target.value.toUpperCase())}
+                                                    placeholder="cth: KYYLAUNCH, HEMAT50K"
+                                                    disabled={isApplyingCoupon}
+                                                    className="w-full h-10 px-3 text-xs uppercase font-mono font-bold rounded-xl border border-slate-200 focus:outline-none focus:border-[#2563EB] disabled:opacity-60"
+                                                />
+                                                <button
+                                                    type="button"
+                                                    onClick={handleApplyCoupon}
+                                                    disabled={!couponCode.trim() || isApplyingCoupon}
+                                                    className="px-4 h-10 rounded-xl bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold transition-colors cursor-pointer shrink-0 disabled:opacity-50"
+                                                >
+                                                    {isApplyingCoupon ? '...' : (lang === 'ID' ? 'Pakai' : 'Apply')}
+                                                </button>
+                                            </div>
+                                        ) : (
+                                            <div className="p-3 rounded-xl bg-emerald-50 border border-emerald-200 flex items-center justify-between">
+                                                <div>
+                                                    <div className="flex items-center space-x-1.5 text-xs font-bold text-emerald-800">
+                                                        <Check className="w-3.5 h-3.5 text-emerald-600" />
+                                                        <span className="font-mono">{appliedCoupon.code}</span>
+                                                        <span className="text-[10px] bg-emerald-200 text-emerald-900 px-1.5 py-0.5 rounded font-sans font-bold">
+                                                            {appliedCoupon.discountLabel}
+                                                        </span>
+                                                    </div>
+                                                    <p className="text-[11px] text-emerald-700 mt-0.5 font-medium">{appliedCoupon.name}</p>
+                                                </div>
+                                                <button
+                                                    type="button"
+                                                    onClick={handleRemoveCoupon}
+                                                    className="text-xs font-bold text-rose-600 hover:text-rose-700 underline cursor-pointer shrink-0 ml-2"
+                                                >
+                                                    {lang === 'ID' ? 'Hapus' : 'Remove'}
+                                                </button>
+                                            </div>
+                                        )}
+
+                                        {couponMessage && !appliedCoupon && (
                                             <p className="text-emerald-600 text-xs font-bold mt-1.5 flex items-center">
                                                 <Check className="w-3.5 h-3.5 mr-1" /> {couponMessage}
                                             </p>
@@ -387,9 +447,9 @@ export default function CheckoutIndex({ product, productId }) {
                                             <span className="font-mono text-slate-900 font-bold">{formatRupiah(basePrice)}</span>
                                         </div>
 
-                                        {appliedDiscount > 0 && (
+                                        {discountAmount > 0 && (
                                             <div className="flex justify-between text-emerald-600 font-bold">
-                                                <span>{lang === 'ID' ? `Diskon Kupon (${appliedDiscount}%)` : `Coupon Discount (${appliedDiscount}%)`}</span>
+                                                <span>{lang === 'ID' ? `Potongan Diskon (${appliedCoupon?.discountLabel || 'Kupon'})` : `Coupon Discount`}</span>
                                                 <span className="font-mono">- {formatRupiah(discountAmount)}</span>
                                             </div>
                                         )}
@@ -397,7 +457,7 @@ export default function CheckoutIndex({ product, productId }) {
                                         <div className="flex justify-between text-slate-600 font-medium">
                                             <span>{lang === 'ID' ? 'Biaya Layanan Pembayaran' : 'Payment Gateway Fee'}</span>
                                             <span className="font-mono text-slate-900 font-bold">
-                                                {currentFee === 0 ? (lang === 'ID' ? 'Rp 0 (Gratis)' : 'Rp 0 (Free)') : formatRupiah(currentFee)}
+                                                {currentFee === 0 ? (lang === 'ID' ? 'Rp 0 (Bebas Biaya)' : 'Rp 0 (Free)') : formatRupiah(currentFee)}
                                             </span>
                                         </div>
                                     </div>

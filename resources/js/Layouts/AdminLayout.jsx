@@ -26,7 +26,8 @@ import {
     Shield, 
     ExternalLink,
     ChevronRight,
-    Activity
+    Activity,
+    Tag
 } from 'lucide-react';
 
 export default function AdminLayout({ children, title = 'Dashboard Super Admin', breadcrumb = 'Home > Dashboard' }) {
@@ -50,6 +51,7 @@ export default function AdminLayout({ children, title = 'Dashboard Super Admin',
                 { name: 'Seller', href: '/admin/sellers', icon: Store },
                 { name: 'Produk', href: '/admin/products', icon: Package },
                 { name: 'Kategori', href: '/admin/categories', icon: FolderTree },
+                { name: 'Kupon & Promo', href: '/admin/coupons', icon: Tag },
             ]
         },
         {

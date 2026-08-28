@@ -26,6 +26,7 @@ use App\Http\Controllers\Admin\AdminPortfolioController;
 use App\Http\Controllers\Admin\AdminNotificationController;
 use App\Http\Controllers\Admin\AdminSettingController;
 use App\Http\Controllers\Admin\AdminAnalyticsController;
+use App\Http\Controllers\Admin\AdminCouponController;
 use App\Http\Controllers\User\UserDashboardController;
 use App\Http\Controllers\Seller\SellerDashboardController;
 use App\Http\Controllers\Seller\SellerProductController;
@@ -152,6 +153,12 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
     Route::get('/categories', [AdminCategoryController::class, 'index'])->name('categories');
     Route::post('/categories', [AdminCategoryController::class, 'store'])->name('categories.store');
     Route::delete('/categories/{id}', [AdminCategoryController::class, 'destroy'])->name('categories.destroy');
+
+    // Promo Coupons Management
+    Route::get('/coupons', [AdminCouponController::class, 'index'])->name('coupons');
+    Route::post('/coupons', [AdminCouponController::class, 'store'])->name('coupons.store');
+    Route::patch('/coupons/{id}/toggle', [AdminCouponController::class, 'toggleStatus'])->name('coupons.toggle');
+    Route::delete('/coupons/{id}', [AdminCouponController::class, 'destroy'])->name('coupons.destroy');
 
     // Financial Management (Payments, Commissions, Withdrawals)
     Route::get('/payments', [AdminFinancialController::class, 'payments'])->name('payments');

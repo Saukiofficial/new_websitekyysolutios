@@ -9,6 +9,7 @@ use App\Models\OrderItem;
 use App\Models\Payment;
 use App\Models\ProductAccess;
 use App\Models\User;
+use App\Models\Coupon;
 use App\Services\Payment\MidtransService;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
@@ -88,18 +89,22 @@ class CheckoutController extends Controller
         $orderNumber = 'KYY-ORD-' . date('Ymd') . '-' . strtoupper(Str::random(5));
         $fee = $validated['payment_method'] === 'qris' ? 0 : 4000;
         
-        // Calculate optional coupon discount
+        // Calculate dynamic coupon discount from database
         $discount = 0;
+        $validCoupon = null;
         if (!empty($validated['coupon_code'])) {
             $code = strtoupper(trim($validated['coupon_code']));
-            if ($code === 'KYYSPECIAL') {
-                $discount = (int) ($product->price * 0.10);
-            } elseif ($code === 'LAUNCH50') {
-                $discount = (int) ($product->price * 0.15);
+            $coupon = Coupon::where('code', $code)->first();
+            if ($coupon) {
+                $check = $coupon->validateForAmount($product->price);
+                if ($check['valid']) {
+                    $discount = $coupon->calculateDiscount($product->price);
+                    $validCoupon = $coupon;
+                }
             }
         }
 
-        $total = ($product->price - $discount) + $fee;
+        $total = max(0, ($product->price - $discount)) + $fee;
 
         // Transactional Database Insert
         $order = DB::transaction(function () use ($validated, $product, $orderNumber, $fee, $discount, $total) {

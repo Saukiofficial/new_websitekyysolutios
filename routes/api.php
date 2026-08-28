@@ -3,6 +3,7 @@
 use App\Http\Controllers\Api\TrackingController;
 use App\Http\Controllers\Api\PaymentWebhookController;
 use App\Http\Controllers\Api\AiChatController;
+use App\Http\Controllers\Api\CouponController;
 use Illuminate\Support\Facades\Route;
 
 Route::post('/track-event', [TrackingController::class, 'track']);
@@ -12,3 +13,6 @@ Route::post('/payments/midtrans/webhook', [PaymentWebhookController::class, 'han
 
 // AI Virtual Assistant Chatbot Endpoint
 Route::post('/ai/chat', [AiChatController::class, 'chat']);
+
+// Coupon Validation Endpoint
+Route::post('/coupons/validate', [CouponController::class, 'validateCoupon']);

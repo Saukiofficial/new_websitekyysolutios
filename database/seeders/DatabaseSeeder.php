@@ -15,6 +15,7 @@ class DatabaseSeeder extends Seeder
             MarketplaceSeeder::class,
             BlogAndPortfolioSeeder::class,
             ActivityLogSeeder::class,
+            CouponSeeder::class,
         ]);
     }
 }

@@ -175,17 +175,25 @@ Poin-poin berikut adalah **penyesuaian krusial** yang harus dilakukan agar aplik
 Fitur-fitur di bawah ini tidak menghalangi fungsionalitas inti, namun sangat direkomendasikan untuk menaikkan nilai jual dan profesionalitas platform ke level *production*:
 
 ### A. Sistem Pembayaran & Notifikasi Otomatis (Production Payment Gateway)
-- [ ] **Webhook Gateway Riil (Midtrans / Xendit / Tripay)**:
-  - Integrasi SDK Midtrans Snap / Xendit Invoice untuk generate QRIS dinamis asli dan Virtual Account perbankan nyata.
-  - Endpoint Webhook terverifikasi dengan signature key untuk auto-update order status dari `pending` ke `paid`.
-- [ ] **Notifikasi WhatsApp Otomatis (Fonnte / Wablas API)**:
-  - Pengiriman otomatis pesan konfirmasi invoice dan link akses produk langsung ke WhatsApp pembeli saat order berhasil.
+- [x] **Webhook Gateway Riil (Midtrans Snap API + Signature SHA512 + Realtime Status Polling)**:
+  - Integrasi Midtrans Snap API, modal pembayaran QRIS dinamis, Virtual Account BCA/Mandiri/BRI/BNI, dan E-Wallet.
+  - Endpoint Webhook terverifikasi `POST /api/payments/midtrans/webhook` dengan validasi SHA512 signature hash.
+  - Tombol Real-Time Payment Status Check (`/orders/{orderNumber}/check-status`) untuk mengatasi keterlambatan callback gateway.
+- [x] **Notifikasi WhatsApp Otomatis (Fonnte / Wablas API Engine)**:
+  - `WhatsAppNotificationService.php` otomatis mengirim detail pesanan, rincian item, dan Kunci Lisensi Komersial langsung ke nomor WhatsApp pembeli saat status menjadi `paid`.
 - [ ] **Notifikasi Email SMTP Transaksional (Mailgun / Resend / Brevo)**:
   - Pengiriman email tanda terima pembayaran (invoice PDF) & License Key pembeli.
 
 ### B. Fitur Marketplace Lanjutan (Multi-Vendor Experience)
-- [ ] **Kupon & Kode Promo Diskon**:
-  - Tabel `coupons` dengan diskon persentase (%) atau nominal potongan langsung (Rp) saat checkout.
+- [x] **Kupon & Kode Promo Diskon**:
+  - Tabel database `coupons`, Model `Coupon.php` (Diskon % atau Potongan Langsung Rp, min order, batas limit kuota).
+  - API endpoint validasi instan `POST /api/coupons/validate`.
+  - Integrasi UI Checkout dengan live discount deduction dan banner promo.
+  - Modul Manajemen Kupon Super Admin di `/admin/coupons` lengkap dengan form buat kupon, toggle status, dan tracking penggunaan.
+- [x] **AI Virtual Assistant Chatbot ("Asisten KyySolutions")**:
+  - Floating chatbot widget dengan avatar maskot 3D robot KyySolutions (`ai_widget.png`).
+  - Backend controller terhubung ke model live `kyysolutions` dengan grounding knowledge profil founder **Sauki Annaim** asal **Sumenep** dan katalog produk MySQL.
+  - Parser Markdown visual bebas asteris tebal untuk jawaban yang rapi, bersih, dan mengalir.
 - [ ] **Sistem Bundling & Diskon Beli Banyak**:
   - Paket diskon spesial jika pembeli membeli template sekaligus dengan jasa kustomisasinya (*Cross-Selling Synergy*).
 - [ ] **Pemberitahuan Update Versi ke Pembeli**:
@@ -194,8 +202,9 @@ Fitur-fitur di bawah ini tidak menghalangi fungsionalitas inti, namun sangat dir
   - Fitur tanya-jawab seputar produk sebelum membeli (Direct Message).
 
 ### C. Keamanan & Lisensi Digital (DRM & Invoicing)
-- [ ] **Download Invoice Resmi Format PDF**:
-  - Generate dokumen faktur pajak / receipt pembelian digital berformat PDF menggunakan `barryvdh/laravel-dompdf`.
+- [x] **Download Invoice Resmi Format PDF**:
+  - Generate dokumen faktur pajak & bukti kepemilikan lisensi komersial PDF resmi (`KyySolutions-Invoice-*.pdf`) menggunakan `barryvdh/laravel-dompdf`.
+  - Akses download instan di Halaman Sukses, Riwayat Order Pembeli, dan Panel Super Admin.
 - [ ] **API License Validation Engine**:
   - Endpoint publik `POST /api/v1/verify-license` untuk memverifikasi keaslian lisensi software saat aplikasi pembeli di-deploy.
 - [ ] **Watermark & Enkripsi Download**:
@@ -210,13 +219,14 @@ Fitur-fitur di bawah ini tidak menghalangi fungsionalitas inti, namun sangat dir
 | **P1 (Wajib)** | Update `DatabaseSeeder` & Seed Blog, Portfolio, Activity Logs | **SELESAI ✅** | Database |
 | **P1 (Wajib)** | Integrasikan produk dari MySQL ke `MarketplaceController` | **SELESAI ✅** | Backend / Frontend |
 | **P1 (Wajib)** | Fitur Upload Thumbnail & Cover Image (Produk, Blog, Portofolio) | **SELESAI ✅** | Frontend / Backend / Media |
-| **P1 (Wajib)** | Terapkan proteksi route middleware `auth` & role | **SELESAI ✅** | Keamanan |
+| **P1 (Wajib)** | Terapkan proteksi route middleware `auth` & role guard | **SELESAI ✅** | Keamanan |
 | **P1 (Wajib)** | Penyesuaian nama & setting branding `.env` | **SELESAI ✅** | Konfigurasi |
 | **P2 (Sedang)** | Sambungkan Form Konsultasi Project ke WhatsApp / Database | **SELESAI ✅** | Fitur Layanan |
-| **P3 (Opsional)** | Integrasi Live Payment Gateway Webhook (Midtrans) + Failover & Status Polling | **SELESAI ✅** | Pembayaran & DRM |
-| **P3 (Opsional)** | Generate Invoice PDF otomatis (Receipt Pembelian & DRM Key) | **SELESAI ✅** | Fitur Pembeli |
-| **P3 (Opsional)** | Integrasi Notifikasi WhatsApp Bot ke Pembeli setelah Order Lunas | **SELESAI ✅** | Komunikasi & Notifikasi |
-| **P3 (Opsional)** | Integrasi AI Assistant Chatbot ("Asisten KyySolutions") | **SELESAI ✅** | Fitur AI & Chatbot |
+| **P3 (Fitur Lanjut)** | Integrasi Live Payment Gateway Webhook (Midtrans) + Failover & Status Polling | **SELESAI ✅** | Pembayaran & DRM |
+| **P3 (Fitur Lanjut)** | Generate Invoice PDF otomatis (Receipt Pembelian & DRM Key) | **SELESAI ✅** | Fitur Pembeli |
+| **P3 (Fitur Lanjut)** | Integrasi Notifikasi WhatsApp Bot ke Pembeli setelah Order Lunas | **SELESAI ✅** | Komunikasi & Notifikasi |
+| **P3 (Fitur Lanjut)** | Integrasi AI Assistant Chatbot ("Asisten KyySolutions" + Avatar 3D) | **SELESAI ✅** | Fitur AI & Chatbot |
+| **P3 (Fitur Lanjut)** | Sistem Kupon & Kode Promo Diskon (% / Rp) + Panel Admin Kupon | **SELESAI ✅** | Marketplace & Promo |
 
 ---
 
