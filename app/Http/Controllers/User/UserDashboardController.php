@@ -218,4 +218,67 @@ class UserDashboardController extends Controller
 
         return redirect()->back()->with('success', 'Terima kasih! Ulasan Anda berhasil dikirim.');
     }
+
+    /**
+     * Display buyer wishlist.
+     */
+     public function wishlist(Request $request): Response
+     {
+         $user = $this->getCustomerUser();
+         $wishlistIds = session('user_wishlist', []);
+
+         $query = Product::with(['category', 'seller.store', 'links']);
+         if (!empty($wishlistIds)) {
+             $products = $query->whereIn('id', $wishlistIds)->get();
+         } else {
+             // Default showcase if empty
+             $products = $query->take(4)->get();
+         }
+
+         $formattedProducts = $products->map(function ($prod) {
+             return [
+                 'id' => $prod->id,
+                 'title' => $prod->title,
+                 'slug' => $prod->slug,
+                 'category' => $prod->category?->name ?? 'Software & SaaS',
+                 'price' => $prod->price,
+                 'priceFormatted' => $prod->price_formatted,
+                 'originalPrice' => 'Rp ' . number_format($prod->price * 1.35, 0, ',', '.'),
+                 'discount' => '25% OFF',
+                 'rating' => $prod->rating ?? 4.9,
+                 'downloads' => $prod->sales_count ?? rand(40, 150),
+                 'storeName' => $prod->seller?->store?->name ?? 'KyySolutions Official',
+                 'thumbnail' => $prod->thumbnail_url ?? '/images/products/saas.png',
+                 'shortDescription' => $prod->excerpt ?? 'Template aplikasi siap pakai dengan arsitektur bersih dan performa tinggi.',
+                 'deliveryChannel' => $prod->delivery_channel ?? 'google_drive',
+             ];
+         });
+
+         return Inertia::render('User/Wishlist', [
+             'wishlist' => $formattedProducts,
+             'user' => [
+                 'name' => $user?->name ?? 'User Buyer',
+                 'email' => $user?->email ?? 'buyer@kyysolutions.com',
+             ],
+         ]);
+     }
+
+     /**
+      * Toggle product in user wishlist.
+      */
+     public function toggleWishlist(Request $request)
+     {
+         $productId = $request->input('product_id');
+         $wishlist = session('user_wishlist', []);
+
+         if (in_array($productId, $wishlist)) {
+             $wishlist = array_values(array_filter($wishlist, fn($id) => $id != $productId));
+             session(['user_wishlist' => $wishlist]);
+             return redirect()->back()->with('success', 'Produk berhasil dihapus dari Wishlist.');
+         } else {
+             $wishlist[] = $productId;
+             session(['user_wishlist' => $wishlist]);
+             return redirect()->back()->with('success', 'Produk berhasil disimpan ke Wishlist!');
+         }
+     }
 }

@@ -78,7 +78,7 @@ export default function ContactModal({ isOpen, onClose }) {
               `🏢 Company/Email: ${company || '-'}\n` +
               `📝 Project Details: ${description || '-'}`;
 
-        const url = `https://wa.me/6281234567890?text=${encodeURIComponent(text)}`;
+        const url = `https://wa.me/6281232916758?text=${encodeURIComponent(text)}`;
         window.open(url, '_blank');
         onClose();
     };

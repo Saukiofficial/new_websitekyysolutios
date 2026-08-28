@@ -4,6 +4,7 @@ import {
     Home, 
     ShoppingBag, 
     FileText, 
+    Heart,
     Activity, 
     Download, 
     Settings, 
@@ -87,6 +88,17 @@ export default function BuyerLayout({ children, activeTab = 'products' }) {
                             <span>Eksplor Software Baru</span>
                         </Link>
 
+                        {/* Wishlist Button */}
+                        <Link
+                            href="/dashboard/wishlist"
+                            className={`w-10 h-10 rounded-xl border border-[#E2E8F0] hover:bg-slate-50 flex items-center justify-center transition-colors ${
+                                url.includes('wishlist') ? 'text-rose-600 bg-rose-50 border-rose-200' : 'text-slate-600 hover:text-rose-600'
+                            }`}
+                            title="Wishlist & Tersimpan"
+                        >
+                            <Heart className="w-4 h-4" />
+                        </Link>
+
                         {/* Cart Button */}
                         <Link
                             href="/marketplace"
@@ -159,6 +171,18 @@ export default function BuyerLayout({ children, activeTab = 'products' }) {
                             title="Riwayat Faktur Transaksi"
                         >
                             <FileText className="w-5 h-5" />
+                        </Link>
+
+                        <Link
+                            href="/dashboard/wishlist"
+                            className={`w-11 h-11 rounded-xl flex items-center justify-center transition-colors ${
+                                url.includes('wishlist')
+                                    ? 'bg-rose-50 text-rose-600'
+                                    : 'text-slate-500 hover:text-rose-600 hover:bg-slate-50'
+                            }`}
+                            title="Wishlist & Software Favorit"
+                        >
+                            <Heart className="w-5 h-5" />
                         </Link>
 
                         <Link

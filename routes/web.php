@@ -4,6 +4,8 @@ use App\Http\Controllers\Web\LandingPageController;
 use App\Http\Controllers\Web\MarketplaceController;
 use App\Http\Controllers\Web\ProductController;
 use App\Http\Controllers\Web\ServiceController;
+use App\Http\Controllers\Web\PortfolioController;
+use App\Http\Controllers\Web\BlogController;
 use App\Http\Controllers\Web\CheckoutController;
 use App\Http\Controllers\Auth\AuthController;
 use App\Http\Controllers\Auth\SellerAuthController;
@@ -19,6 +21,8 @@ use App\Http\Controllers\Admin\AdminReviewController;
 use App\Http\Controllers\Admin\AdminReportController;
 use App\Http\Controllers\Admin\AdminServiceController;
 use App\Http\Controllers\Admin\AdminContentController;
+use App\Http\Controllers\Admin\AdminBlogController;
+use App\Http\Controllers\Admin\AdminPortfolioController;
 use App\Http\Controllers\Admin\AdminNotificationController;
 use App\Http\Controllers\Admin\AdminSettingController;
 use App\Http\Controllers\Admin\AdminAnalyticsController;
@@ -33,6 +37,10 @@ use Illuminate\Support\Facades\Route;
 // Public Guest Routes
 Route::get('/', LandingPageController::class)->name('home');
 Route::get('/services', [ServiceController::class, 'index'])->name('services.index');
+Route::get('/portfolio', [PortfolioController::class, 'index'])->name('portfolio.index');
+Route::get('/portfolio/{slug}', [PortfolioController::class, 'show'])->name('portfolio.show');
+Route::get('/blog', [BlogController::class, 'index'])->name('blog.index');
+Route::get('/blog/{slug}', [BlogController::class, 'show'])->name('blog.show');
 Route::get('/marketplace', [MarketplaceController::class, 'index'])->name('marketplace.index');
 Route::get('/products/{slug}', [ProductController::class, 'show'])->name('products.show');
 Route::get('/stores/{slug}', [SellerStoreController::class, 'showPublic'])->name('stores.show');
@@ -47,6 +55,8 @@ Route::prefix('dashboard')->group(function () {
     Route::get('/', fn() => redirect()->route('user.my-products'));
     Route::get('/my-products', [UserDashboardController::class, 'myProducts'])->name('user.my-products');
     Route::get('/orders', [UserDashboardController::class, 'orders'])->name('user.orders');
+    Route::get('/wishlist', [UserDashboardController::class, 'wishlist'])->name('user.wishlist');
+    Route::post('/wishlist/toggle', [UserDashboardController::class, 'toggleWishlist'])->name('user.wishlist.toggle');
     Route::post('/reviews', [UserDashboardController::class, 'submitReview'])->name('user.reviews.store');
 });
 
@@ -134,8 +144,20 @@ Route::prefix('admin')->name('admin.')->group(function () {
 
     // Business Services & Content
     Route::get('/services', [AdminServiceController::class, 'index'])->name('services');
-    Route::get('/portfolio', [AdminContentController::class, 'portfolio'])->name('portfolio');
-    Route::get('/blog', [AdminContentController::class, 'blog'])->name('blog');
+    
+    // Blog & Knowledge Hub CMS
+    Route::get('/blog', [AdminBlogController::class, 'index'])->name('blog');
+    Route::post('/blog', [AdminBlogController::class, 'store'])->name('blog.store');
+    Route::put('/blog/{id}', [AdminBlogController::class, 'update'])->name('blog.update');
+    Route::delete('/blog/{id}', [AdminBlogController::class, 'destroy'])->name('blog.destroy');
+    Route::patch('/blog/{id}/featured', [AdminBlogController::class, 'toggleFeatured'])->name('blog.featured');
+
+    // Portfolio & Case Studies CMS
+    Route::get('/portfolio', [AdminPortfolioController::class, 'index'])->name('portfolio');
+    Route::post('/portfolio', [AdminPortfolioController::class, 'store'])->name('portfolio.store');
+    Route::put('/portfolio/{id}', [AdminPortfolioController::class, 'update'])->name('portfolio.update');
+    Route::delete('/portfolio/{id}', [AdminPortfolioController::class, 'destroy'])->name('portfolio.destroy');
+    Route::patch('/portfolio/{id}/featured', [AdminPortfolioController::class, 'toggleFeatured'])->name('portfolio.featured');
 
     // System Settings & Notifications
     Route::get('/notifications', [AdminNotificationController::class, 'index'])->name('notifications');

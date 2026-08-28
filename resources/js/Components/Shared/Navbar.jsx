@@ -1,32 +1,32 @@
 import { useState, useEffect, useRef } from 'react';
-import { Link } from '@inertiajs/react';
-import { Menu, X, ChevronDown, ArrowRight, Check } from 'lucide-react';
+import { Link, usePage } from '@inertiajs/react';
+import { Menu, X, ChevronDown, Check, ArrowRight } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useLanguage } from '@/Context/LanguageContext';
 
-// Crisp vector Flag of the United Kingdom (English)
+// UK Flag Icon (SVG)
 const UKFlag = () => (
-    <svg className="w-4.5 h-3 rounded-[2px] shadow-xs shrink-0 object-cover" viewBox="0 0 60 30" fill="none">
-        <clipPath id="uk-flag-clip">
-            <rect width="60" height="30" rx="2" />
+    <svg className="w-5 h-3.5 rounded-[2px] shadow-xs object-cover" viewBox="0 0 60 30" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <clipPath id="uk-clip">
+            <path d="M0 0v30h60V0H0z"/>
         </clipPath>
-        <g clipPath="url(#uk-flag-clip)">
-            <rect width="60" height="30" fill="#012169" />
-            <path d="M0 0L60 30M60 0L0 30" stroke="#FFFFFF" strokeWidth="6" />
-            <path d="M0 0L60 30M60 0L0 30" stroke="#C8102E" strokeWidth="3.5" />
-            <path d="M30 0V30M0 15H60" stroke="#FFFFFF" strokeWidth="10" />
-            <path d="M30 0V30M0 15H60" stroke="#C8102E" strokeWidth="6" />
+        <g clipPath="url(#uk-clip)">
+            <path d="M0 0v30h60V0H0z" fill="#012169"/>
+            <path d="M0 0l60 30m0-30L0 30" stroke="#fff" strokeWidth="6"/>
+            <path d="M0 0l60 30m0-30L0 30" stroke="#C8102E" strokeWidth="4"/>
+            <path d="M30 0v30M0 15h60" stroke="#fff" strokeWidth="10"/>
+            <path d="M30 0v30M0 15h60" stroke="#C8102E" strokeWidth="6"/>
         </g>
     </svg>
 );
 
-// Crisp vector Flag of Indonesia (Bahasa)
+// Indonesian Flag Icon (SVG)
 const IDFlag = () => (
-    <svg className="w-4.5 h-3 rounded-[2px] shadow-xs shrink-0 border border-slate-200/80" viewBox="0 0 60 30" fill="none">
-        <clipPath id="id-flag-clip">
-            <rect width="60" height="30" rx="2" />
+    <svg className="w-5 h-3.5 rounded-[2px] shadow-xs border border-slate-200 object-cover" viewBox="0 0 60 30" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <clipPath id="id-clip">
+            <path d="M0 0v30h60V0H0z"/>
         </clipPath>
-        <g clipPath="url(#id-flag-clip)">
+        <g clipPath="url(#id-clip)">
             <rect width="60" height="15" fill="#E70011" />
             <rect y="15" width="60" height="15" fill="#FFFFFF" />
         </g>
@@ -35,8 +35,8 @@ const IDFlag = () => (
 
 export default function Navbar({ onOpenContact }) {
     const { lang, setLanguage, t } = useLanguage();
+    const { url } = usePage();
     const [isOpen, setIsOpen] = useState(false);
-    const [activeNav, setActiveNav] = useState('Home');
     const [langDropdown, setLangDropdown] = useState(false);
     const dropdownRef = useRef(null);
 
@@ -44,10 +44,36 @@ export default function Navbar({ onOpenContact }) {
         { name: t.nav.home, key: 'Home', href: '/' },
         { name: t.nav.services, key: 'Services', href: '/services' },
         { name: t.nav.products, key: 'Products', href: '/marketplace' },
-        { name: t.nav.portfolio, key: 'Portfolio', href: '/#portfolio' },
+        { name: t.nav.portfolio, key: 'Portfolio', href: '/portfolio' },
+        { name: 'Blog', key: 'Blog', href: '/blog' },
         { name: t.nav.whyUs, key: 'Why Us', href: '/#why-us' },
         { name: t.nav.process, key: 'Process', href: '/#how-it-works' },
     ];
+
+    const isCurrentActive = (item) => {
+        if (item.key === 'Home') {
+            return url === '/' || url === '';
+        }
+        if (item.key === 'Services') {
+            return url.startsWith('/services');
+        }
+        if (item.key === 'Products') {
+            return url.startsWith('/marketplace') || url.startsWith('/products');
+        }
+        if (item.key === 'Portfolio') {
+            return url.startsWith('/portfolio');
+        }
+        if (item.key === 'Blog') {
+            return url.startsWith('/blog');
+        }
+        if (item.key === 'Why Us') {
+            return url.includes('#why-us');
+        }
+        if (item.key === 'Process') {
+            return url.includes('#how-it-works');
+        }
+        return false;
+    };
 
     // Close language dropdown on outside click
     useEffect(() => {
@@ -86,15 +112,16 @@ export default function Navbar({ onOpenContact }) {
                 {/* Center: Horizontal Navigation Links */}
                 <nav className="hidden lg:flex items-center space-x-8 xl:space-x-10">
                     {navItems.map((item) => {
-                        const isActive = activeNav === item.key;
-                        return (
+                        const isActive = isCurrentActive(item);
+                        const isHash = item.href.startsWith('/#');
+
+                        return isHash ? (
                             <a
                                 key={item.key}
                                 href={item.href}
-                                onClick={() => setActiveNav(item.key)}
                                 className={`text-[15px] font-medium transition-colors duration-150 relative py-1 ${
                                     isActive 
-                                        ? 'text-[#2563EB] font-semibold' 
+                                        ? 'text-[#2563EB] font-bold' 
                                         : 'text-[#14213D]/70 hover:text-[#2563EB]'
                                 }`}
                             >
@@ -106,6 +133,24 @@ export default function Navbar({ onOpenContact }) {
                                     />
                                 )}
                             </a>
+                        ) : (
+                            <Link
+                                key={item.key}
+                                href={item.href}
+                                className={`text-[15px] font-medium transition-colors duration-150 relative py-1 ${
+                                    isActive 
+                                        ? 'text-[#2563EB] font-bold' 
+                                        : 'text-[#14213D]/70 hover:text-[#2563EB]'
+                                }`}
+                            >
+                                {item.name}
+                                {isActive && (
+                                    <motion.span 
+                                        layoutId="activeNavIndicator"
+                                        className="absolute -bottom-1.5 left-1/2 -translate-x-1/2 w-4 h-1 bg-[#2563EB] rounded-full"
+                                    />
+                                )}
+                            </Link>
                         );
                     })}
                 </nav>
@@ -185,15 +230,6 @@ export default function Navbar({ onOpenContact }) {
                     >
                         <span>{lang === 'ID' ? 'Daftar' : 'Register'}</span>
                     </Link>
-
-                    {/* Contact Button */}
-                    <button 
-                        onClick={onOpenContact || (() => window.location.href = '#cta')}
-                        className="px-5 py-2.5 rounded-[14px] bg-gradient-to-r from-[#2563EB] to-[#3B82F6] hover:from-[#1D4ED8] hover:to-[#2563EB] text-white text-xs font-bold shadow-md shadow-blue-500/25 hover:shadow-lg hover:shadow-blue-500/35 hover:-translate-y-0.5 active:translate-y-0 transition-all duration-200 inline-flex items-center group cursor-pointer"
-                    >
-                        <span>{t.nav.contactUs}</span>
-                        <ArrowRight className="w-3.5 h-3.5 ml-1.5 group-hover:translate-x-1 transition-transform" />
-                    </button>
                 </div>
 
                 {/* Mobile Menu Toggle Button */}
@@ -213,20 +249,38 @@ export default function Navbar({ onOpenContact }) {
                 <div className="lg:hidden max-w-[1400px] mx-auto mt-2 bg-white/95 backdrop-blur-lg border border-blue-100 shadow-xl rounded-[20px] p-5 space-y-3 pointer-events-auto">
                     {/* Navigation items */}
                     <div className="space-y-1">
-                        {navItems.map((item) => (
-                            <a
-                                key={item.key}
-                                href={item.href}
-                                onClick={() => { setActiveNav(item.key); setIsOpen(false); }}
-                                className={`block px-4 py-2.5 text-sm rounded-xl font-medium transition-colors ${
-                                    activeNav === item.key 
-                                        ? 'bg-blue-50 text-[#2563EB] font-bold' 
-                                        : 'text-[#14213D] hover:bg-slate-50'
-                                }`}
-                            >
-                                {item.name}
-                            </a>
-                        ))}
+                        {navItems.map((item) => {
+                            const isActive = isCurrentActive(item);
+                            const isHash = item.href.startsWith('/#');
+
+                            return isHash ? (
+                                <a
+                                    key={item.key}
+                                    href={item.href}
+                                    onClick={() => setIsOpen(false)}
+                                    className={`block px-4 py-2.5 text-sm rounded-xl font-medium transition-colors ${
+                                        isActive 
+                                            ? 'bg-blue-50 text-[#2563EB] font-bold' 
+                                            : 'text-[#14213D] hover:bg-slate-50'
+                                    }`}
+                                >
+                                    {item.name}
+                                </a>
+                            ) : (
+                                <Link
+                                    key={item.key}
+                                    href={item.href}
+                                    onClick={() => setIsOpen(false)}
+                                    className={`block px-4 py-2.5 text-sm rounded-xl font-medium transition-colors ${
+                                        isActive 
+                                            ? 'bg-blue-50 text-[#2563EB] font-bold' 
+                                            : 'text-[#14213D] hover:bg-slate-50'
+                                    }`}
+                                >
+                                    {item.name}
+                                </Link>
+                            );
+                        })}
                     </div>
 
                     {/* Language Switcher in Mobile Drawer */}
@@ -261,16 +315,16 @@ export default function Navbar({ onOpenContact }) {
                             onClick={() => setIsOpen(false)}
                             className="w-full py-2.5 rounded-[14px] bg-slate-100 hover:bg-slate-200 text-slate-800 text-xs font-bold flex items-center justify-center transition-colors"
                         >
-                            <span>{lang === 'ID' ? 'Masuk ke Akun / Admin' : 'Login / Admin Portal'}</span>
+                            <span>{lang === 'ID' ? 'Masuk' : 'Login'}</span>
                         </Link>
 
-                        <button 
-                            onClick={() => { setIsOpen(false); if (onOpenContact) onOpenContact(); else window.location.href = '#cta'; }}
-                            className="w-full py-3 rounded-[14px] bg-gradient-to-r from-[#2563EB] to-[#3B82F6] text-white text-xs font-bold shadow-md shadow-blue-500/25 flex items-center justify-center cursor-pointer"
+                        <Link
+                            href="/register"
+                            onClick={() => setIsOpen(false)}
+                            className="w-full py-2.5 rounded-[14px] bg-[#2563EB] hover:bg-[#1D4ED8] text-white text-xs font-bold shadow-md shadow-blue-500/25 flex items-center justify-center transition-colors"
                         >
-                            <span>{t.nav.contactUs}</span>
-                            <ArrowRight className="w-4 h-4 ml-1.5" />
-                        </button>
+                            <span>{lang === 'ID' ? 'Daftar Akun Baru' : 'Register Account'}</span>
+                        </Link>
                     </div>
                 </div>
             )}

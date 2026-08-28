@@ -108,7 +108,7 @@ export default function ServicesIndex({ services = [], workflow = [] }) {
             `• Estimasi Biaya: ${calculatedEstimate.formatted}\n` +
             `• Target Waktu: ${calculatedEstimate.timeline}\n\n` +
             `Mohon info ketersediaan jadwal tim & proposal teknisnya. Terima kasih!`;
-        window.open(`https://wa.me/6281234567890?text=${encodeURIComponent(text)}`, '_blank');
+        window.open(`https://wa.me/6281232916758?text=${encodeURIComponent(text)}`, '_blank');
     };
 
     return (
@@ -279,7 +279,7 @@ export default function ServicesIndex({ services = [], workflow = [] }) {
                                     <button
                                         onClick={() => {
                                             const text = `Halo KyySolutions, saya tertarik dengan layanan *${service.title}*. Bisakah berdiskusi mengenai kebutuhan teknis proyek saya?`;
-                                            window.open(`https://wa.me/6281234567890?text=${encodeURIComponent(text)}`, '_blank');
+                                            window.open(`https://wa.me/6281232916758?text=${encodeURIComponent(text)}`, '_blank');
                                         }}
                                         className="px-4 py-2 rounded-xl bg-blue-50 hover:bg-[#2563EB] text-[#2563EB] hover:text-white text-xs font-bold transition-colors inline-flex items-center space-x-1.5 cursor-pointer shadow-2xs"
                                     >

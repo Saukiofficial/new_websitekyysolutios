@@ -86,7 +86,7 @@ export default function Footer() {
                                 <FaFacebookF className="w-3.5 h-3.5" />
                             </a>
                             <a
-                                href="https://wa.me/6281234567890"
+                                href="https://wa.me/6281232916758"
                                 target="_blank"
                                 rel="noopener noreferrer"
                                 className="w-8 h-8 rounded-lg bg-slate-900 border border-slate-800 flex items-center justify-center text-slate-400 hover:text-emerald-400 hover:border-emerald-500/40 transition-colors"
@@ -104,13 +104,13 @@ export default function Footer() {
                         </h4>
                         <ul className="space-y-2.5 text-xs sm:text-sm">
                             <li>
-                                <a href="#services" className="hover:text-white transition-colors">{t.footer.aboutUs}</a>
+                                <Link href="/services" className="hover:text-white transition-colors">{t.footer.services}</Link>
                             </li>
                             <li>
-                                <a href="#why-us" className="hover:text-white transition-colors">{t.footer.ourTeam}</a>
+                                <Link href="/portfolio" className="hover:text-white transition-colors">Showcase Portfolio</Link>
                             </li>
                             <li>
-                                <a href="#portfolio" className="hover:text-white transition-colors">{t.portfolio.title}</a>
+                                <Link href="/blog" className="hover:text-white transition-colors">Blog & Artikel</Link>
                             </li>
                             <li>
                                 <Link href="/seller/register" className="text-blue-400 hover:text-blue-300 font-semibold transition-colors">
@@ -181,11 +181,11 @@ export default function Footer() {
                         <ul className="space-y-3 text-xs">
                             <li className="flex items-start space-x-2">
                                 <Mail className="w-4 h-4 text-[#2563EB] shrink-0 mt-0.5" />
-                                <span>contact@kyysolutions.com</span>
+                                <span>kyysolutions17@gmail.com</span>
                             </li>
                             <li className="flex items-start space-x-2">
                                 <Phone className="w-4 h-4 text-[#2563EB] shrink-0 mt-0.5" />
-                                <span>+62 812-3456-7890</span>
+                                <span>+62 812-3291-6758</span>
                             </li>
                             <li className="flex items-start space-x-2">
                                 <MapPin className="w-4 h-4 text-[#2563EB] shrink-0 mt-0.5" />

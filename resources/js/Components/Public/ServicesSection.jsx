@@ -1,4 +1,5 @@
 import { motion } from 'framer-motion';
+import { Link } from '@inertiajs/react';
 import { 
     Globe, 
     Layers, 
@@ -132,19 +133,16 @@ export default function ServicesSection() {
                                         </div>
                                     </div>
 
-                                    {/* Action Link: Direct Quote Consultation */}
-                                    <a
-                                        href={`https://wa.me/6281234567890?text=${encodeURIComponent(waMessage)}`}
-                                        target="_blank"
-                                        rel="noopener noreferrer"
+                                    {/* Action Link: Route to dedicated /services page */}
+                                    <Link
+                                        href="/services"
                                         className="pt-4 mt-2 border-t border-slate-100 flex items-center justify-between text-xs font-bold text-[#2563EB] hover:text-[#1D4ED8] group/link transition-colors"
                                     >
                                         <span className="flex items-center">
-                                            <MessageSquare className="w-3.5 h-3.5 mr-1.5" />
                                             <span>{t.services.learnMore}</span>
                                         </span>
                                         <ArrowRight className="w-3.5 h-3.5 group-hover/link:translate-x-1 transition-transform" />
-                                    </a>
+                                    </Link>
                                 </div>
                             </motion.div>
                         );

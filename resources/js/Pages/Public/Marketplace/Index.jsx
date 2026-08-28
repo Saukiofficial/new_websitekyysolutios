@@ -1,11 +1,12 @@
 import { useState, useMemo } from 'react';
-import { Head, Link } from '@inertiajs/react';
+import { Head, Link, router } from '@inertiajs/react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
     Search, 
     Star, 
     ArrowRight, 
     Eye, 
+    Heart,
     ShoppingCart, 
     ShoppingBag, 
     Check, 
@@ -251,6 +252,24 @@ export default function MarketplaceIndex({ initialCategory = 'all', searchQuery 
     
     // Quick View Modal
     const [selectedProduct, setSelectedProduct] = useState(null);
+    
+    // Wishlist Saved State
+    const [wishlistIds, setWishlistIds] = useState([]);
+
+    const handleToggleWishlist = (productId, e) => {
+        if (e) {
+            e.preventDefault();
+            e.stopPropagation();
+        }
+        if (wishlistIds.includes(productId)) {
+            setWishlistIds(wishlistIds.filter(id => id !== productId));
+        } else {
+            setWishlistIds([...wishlistIds, productId]);
+        }
+        router.post('/dashboard/wishlist/toggle', { product_id: productId }, {
+            preserveScroll: true,
+        });
+    };
 
     // Filter Options mapped dynamically to active language
     const categoryOptions = [
@@ -813,15 +832,30 @@ export default function MarketplaceIndex({ initialCategory = 'all', searchQuery 
                                                     <div className="h-44 w-full relative overflow-hidden bg-slate-900 border-b border-[#E5EAF2]">
                                                         {PreviewComponent && <PreviewComponent />}
 
-                                                        {/* Badge */}
-                                                        <div className="absolute top-2.5 left-2.5 bg-white text-[#0F172A] text-[10px] font-extrabold px-2.5 py-0.5 rounded-full shadow-xs border border-slate-100">
-                                                            {product.badge}
-                                                        </div>
+                                                        {/* Top Badges & Wishlist */}
+                                                        <div className="absolute top-2.5 left-2.5 right-2.5 flex items-center justify-between z-10">
+                                                            <div className="bg-white text-[#0F172A] text-[10px] font-extrabold px-2.5 py-0.5 rounded-full shadow-xs border border-slate-100">
+                                                                {product.badge}
+                                                            </div>
 
-                                                        {/* Sales count badge */}
-                                                        <div className="absolute top-2.5 right-2.5 bg-black/60 backdrop-blur-xs text-white text-[10px] font-mono px-2 py-0.5 rounded flex items-center">
-                                                            <Download className="w-2.5 h-2.5 mr-1 text-emerald-400" />
-                                                            <span>{product.sales} {mp.sales || (lang === 'ID' ? 'terjual' : 'sales')}</span>
+                                                            <div className="flex items-center space-x-1.5">
+                                                                <button
+                                                                    type="button"
+                                                                    onClick={(e) => handleToggleWishlist(product.id, e)}
+                                                                    className={`w-7 h-7 rounded-full flex items-center justify-center transition-all cursor-pointer shadow-xs ${
+                                                                        wishlistIds.includes(product.id)
+                                                                            ? 'bg-rose-500 text-white'
+                                                                            : 'bg-black/50 backdrop-blur-xs text-white hover:bg-white hover:text-rose-600'
+                                                                    }`}
+                                                                    title="Simpan ke Wishlist"
+                                                                >
+                                                                    <Heart className={`w-3.5 h-3.5 ${wishlistIds.includes(product.id) ? 'fill-white' : ''}`} />
+                                                                </button>
+                                                                <div className="bg-black/60 backdrop-blur-xs text-white text-[10px] font-mono px-2 py-0.5 rounded flex items-center">
+                                                                    <Download className="w-2.5 h-2.5 mr-1 text-emerald-400" />
+                                                                    <span>{product.sales} {mp.sales || (lang === 'ID' ? 'terjual' : 'sales')}</span>
+                                                                </div>
+                                                            </div>
                                                         </div>
 
                                                         {/* Hover Quick Action */}
