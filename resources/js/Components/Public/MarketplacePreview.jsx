@@ -10,7 +10,6 @@ import {
     CreditCard, 
     Layers, 
     Check, 
-    Sparkles, 
     SlidersHorizontal,
     ShoppingBag
 } from 'lucide-react';

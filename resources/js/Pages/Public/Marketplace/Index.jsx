@@ -14,7 +14,6 @@ import {
     Download, 
     X, 
     FileCode2, 
-    Sparkles, 
     RotateCcw,
     ArrowLeft,
     Sliders
@@ -877,15 +876,13 @@ export default function MarketplaceIndex({ initialCategory = 'all', searchQuery 
                                                             {product.priceFormatted}
                                                         </span>
                                                     </div>
-                                                    <a
-                                                        href={`https://wa.me/6281234567890?text=Halo%20KyySolutions,%20saya%20tertarik%20membeli%20produk:%20${encodeURIComponent(product.title)}%20(${product.priceFormatted})`}
-                                                        target="_blank"
-                                                        rel="noopener noreferrer"
+                                                    <Link
+                                                        href={`/checkout/${product.id}`}
                                                         className="px-3.5 py-1.5 rounded-[10px] bg-[#2563EB] hover:bg-[#1D4ED8] text-white text-xs font-bold shadow-xs transition-colors inline-flex items-center"
                                                     >
                                                         <span>{mp.buyNow || (lang === 'ID' ? 'Beli Sekarang' : 'Buy Now')}</span>
                                                         <ArrowRight className="w-3 h-3 ml-1" />
-                                                    </a>
+                                                    </Link>
                                                 </div>
 
                                             </div>
@@ -1025,15 +1022,13 @@ export default function MarketplaceIndex({ initialCategory = 'all', searchQuery 
                                     </span>
                                 </div>
 
-                                <a
-                                    href={`https://wa.me/6281234567890?text=Halo%20KyySolutions,%20saya%20ingin%20membeli%20produk:%20${encodeURIComponent(selectedProduct.title)}%20(${selectedProduct.priceFormatted})`}
-                                    target="_blank"
-                                    rel="noopener noreferrer"
+                                <Link
+                                    href={`/checkout/${selectedProduct.id}`}
                                     className="w-full sm:w-auto px-6 py-3 rounded-xl bg-[#2563EB] hover:bg-[#1D4ED8] text-white text-sm font-bold shadow-lg shadow-blue-500/25 flex items-center justify-center space-x-2"
                                 >
                                     <ShoppingCart className="w-4 h-4" />
-                                    <span>{mp.modal?.buyViaWhatsapp || (lang === 'ID' ? 'Beli via WhatsApp' : 'Buy via WhatsApp')}</span>
-                                </a>
+                                    <span>{lang === 'ID' ? 'Lanjut ke Checkout' : 'Proceed to Checkout'}</span>
+                                </Link>
                             </div>
                         </motion.div>
                     </div>
@@ -1076,7 +1071,7 @@ export default function MarketplaceIndex({ initialCategory = 'all', searchQuery 
 
                         <div className="flex items-center space-x-3.5">
                             <div className="w-11 h-11 rounded-xl bg-blue-600/25 border border-blue-500/30 text-[#3B82F6] flex items-center justify-center shrink-0">
-                                <Sparkles className="w-5 h-5" />
+                                <RotateCcw className="w-5 h-5" />
                             </div>
                             <div>
                                 <h4 className="text-sm font-bold">{mp.benefits?.freeUpdates || (lang === 'ID' ? 'Gratis Pembaruan' : 'Free Updates')}</h4>

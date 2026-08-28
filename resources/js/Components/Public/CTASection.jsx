@@ -1,9 +1,12 @@
 import { motion } from 'framer-motion';
+import { Link } from '@inertiajs/react';
 import { ArrowRight, ShoppingBag, MessageSquare, CheckCircle2 } from 'lucide-react';
 import { useLanguage } from '@/Context/LanguageContext';
+import { useContactModal } from '@/Context/ContactModalContext';
 
 export default function CTASection() {
     const { t } = useLanguage();
+    const { openContact } = useContactModal();
 
     return (
         <section id="cta" className="py-20 md:py-24 bg-white relative">
@@ -49,20 +52,21 @@ export default function CTASection() {
                             transition={{ duration: 0.5, delay: 0.2 }}
                             className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-8"
                         >
-                            <a href="https://wa.me/6281234567890" target="_blank" rel="noopener noreferrer" className="w-full sm:w-auto">
-                                <button className="w-full sm:w-auto px-7 py-3.5 rounded-[10px] bg-white text-[#2563EB] font-bold text-sm hover:bg-blue-50 shadow-md transition-all duration-150 inline-flex items-center justify-center group cursor-pointer">
-                                    <MessageSquare className="w-4 h-4 mr-2" />
-                                    <span>{t.cta.requestQuote}</span>
-                                    <ArrowRight className="w-4 h-4 ml-1.5 group-hover:translate-x-1 transition-transform" />
-                                </button>
-                            </a>
+                            <button 
+                                onClick={openContact}
+                                className="w-full sm:w-auto px-7 py-3.5 rounded-[12px] bg-white text-[#2563EB] font-bold text-sm hover:bg-blue-50 shadow-md hover:shadow-lg transition-all duration-150 inline-flex items-center justify-center group cursor-pointer"
+                            >
+                                <MessageSquare className="w-4 h-4 mr-2" />
+                                <span>{t.cta.requestQuote}</span>
+                                <ArrowRight className="w-4 h-4 ml-1.5 group-hover:translate-x-1 transition-transform" />
+                            </button>
                             
-                            <a href="#marketplace" className="w-full sm:w-auto">
-                                <button className="w-full sm:w-auto px-7 py-3.5 rounded-[10px] bg-transparent text-white border border-white/40 hover:bg-white/10 font-semibold text-sm transition-all duration-150 inline-flex items-center justify-center group cursor-pointer">
+                            <Link href="/marketplace" className="w-full sm:w-auto">
+                                <button className="w-full sm:w-auto px-7 py-3.5 rounded-[12px] bg-transparent text-white border border-white/40 hover:bg-white/10 font-semibold text-sm transition-all duration-150 inline-flex items-center justify-center group cursor-pointer">
                                     <ShoppingBag className="w-4 h-4 mr-2 text-blue-200" />
                                     <span>{t.cta.browseMarketplace}</span>
                                 </button>
-                            </a>
+                            </Link>
                         </motion.div>
 
                         {/* Micro Trust Points */}

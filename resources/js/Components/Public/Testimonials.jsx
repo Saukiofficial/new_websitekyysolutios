@@ -1,17 +1,17 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Star, ChevronLeft, ChevronRight, Quote } from 'lucide-react';
+import { Star, ChevronLeft, ChevronRight, Quote, CheckCircle2 } from 'lucide-react';
 import Card from '@/Components/Shared/Card';
 import { fadeInUp } from '@/Lib/animations';
 import { useLanguage } from '@/Context/LanguageContext';
 
 export default function Testimonials() {
-    const { t } = useLanguage();
+    const { t, lang } = useLanguage();
 
     const avatarStyles = [
-        { avatarBg: 'bg-blue-600', initials: 'AF', rating: 5 },
-        { avatarBg: 'bg-indigo-600', initials: 'SJ', rating: 5 },
-        { avatarBg: 'bg-slate-800', initials: 'MT', rating: 5 },
+        { avatarBg: 'bg-blue-600', initials: 'AF', rating: 5, project: 'E-Commerce Platform' },
+        { avatarBg: 'bg-indigo-600', initials: 'SJ', rating: 5, project: 'Telemedicine Web App' },
+        { avatarBg: 'bg-slate-800', initials: 'MT', rating: 5, project: 'Cloud POS & KDS' },
     ];
 
     const testimonials = t.testimonials.items.map((item, index) => ({
@@ -34,10 +34,12 @@ export default function Testimonials() {
     const clientLogos = [
         'TECHVISION',
         'NEXA GLOBAL',
-        'SCALEUP',
-        'HYPERION',
+        'SCALEUP MEDIA',
+        'HYPERION LABS',
         'CLOUDSTACK',
-        'APEX LABS'
+        'APEX LOGISTICS',
+        'MEDIXCARE',
+        'VENTUREFLOW'
     ];
 
     return (
@@ -64,9 +66,9 @@ export default function Testimonials() {
                 </motion.div>
 
                 {/* Testimonial Slider Card */}
-                <div className="max-w-4xl mx-auto mb-16">
-                    <Card className="p-8 sm:p-12 relative bg-white border-slate-200/80 shadow-soft">
-                        <Quote className="w-12 h-12 text-blue-100 absolute top-8 right-8 pointer-events-none" />
+                <div className="max-w-4xl mx-auto mb-20">
+                    <div className="rounded-3xl bg-white border border-slate-200/90 shadow-[0_10px_30px_rgba(20,33,61,0.05)] p-8 sm:p-12 relative overflow-hidden">
+                        <Quote className="w-14 h-14 text-blue-50 absolute top-6 right-6 pointer-events-none" />
                         
                         <AnimatePresence mode="wait">
                             <motion.div
@@ -74,14 +76,20 @@ export default function Testimonials() {
                                 initial={{ opacity: 0, x: 20 }}
                                 animate={{ opacity: 1, x: 0 }}
                                 exit={{ opacity: 0, x: -20 }}
-                                transition={{ duration: 0.3 }}
+                                transition={{ duration: 0.25 }}
                                 className="relative z-10"
                             >
-                                {/* Rating Stars */}
-                                <div className="flex items-center space-x-1 text-amber-400 mb-6">
-                                    {[...Array(current.rating)].map((_, i) => (
-                                        <Star key={i} className="w-5 h-5 fill-current" />
-                                    ))}
+                                {/* Rating Stars & Verified Badge */}
+                                <div className="flex items-center justify-between mb-6">
+                                    <div className="flex items-center space-x-1 text-amber-400">
+                                        {[...Array(current.rating)].map((_, i) => (
+                                            <Star key={i} className="w-5 h-5 fill-current" />
+                                        ))}
+                                    </div>
+                                    <span className="inline-flex items-center text-xs font-bold text-emerald-600 bg-emerald-50 px-3 py-1 rounded-full border border-emerald-100">
+                                        <CheckCircle2 className="w-3.5 h-3.5 mr-1" />
+                                        <span>Verified Client</span>
+                                    </span>
                                 </div>
 
                                 {/* Quote Content */}
@@ -89,54 +97,81 @@ export default function Testimonials() {
                                     "{current.quote}"
                                 </blockquote>
 
-                                {/* Client Info */}
-                                <div className="flex items-center space-x-4">
-                                    <div className={`w-12 h-12 rounded-full ${current.avatarBg} text-white font-bold flex items-center justify-center text-sm shadow-xs`}>
-                                        {current.initials}
+                                {/* Client Info & Slider Navigation */}
+                                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pt-6 border-t border-slate-100">
+                                    <div className="flex items-center space-x-4">
+                                        <div className={`w-13 h-13 rounded-2xl ${current.avatarBg} text-white font-black flex items-center justify-center text-base shadow-sm`}>
+                                            {current.initials}
+                                        </div>
+                                        <div>
+                                            <div className="font-extrabold text-[#14213D] text-base">
+                                                {current.name}
+                                            </div>
+                                            <div className="text-xs text-slate-500 font-medium">
+                                                {current.role}, <span className="text-[#2563EB] font-bold">{current.company}</span>
+                                            </div>
+                                            <div className="text-[10px] text-slate-400 mt-0.5 font-mono">
+                                                Project: {current.project}
+                                            </div>
+                                        </div>
                                     </div>
-                                    <div>
-                                        <div className="font-bold text-[#14213D] text-base">
-                                            {current.name}
+
+                                    {/* Slider Controls */}
+                                    <div className="flex items-center space-x-2 self-end sm:self-auto">
+                                        <button
+                                            onClick={prevSlide}
+                                            className="w-10 h-10 rounded-xl bg-slate-100 hover:bg-[#2563EB] hover:text-white text-slate-600 flex items-center justify-center transition-all duration-150 shadow-2xs cursor-pointer"
+                                            aria-label="Previous Testimonial"
+                                        >
+                                            <ChevronLeft className="w-5 h-5" />
+                                        </button>
+                                        <div className="text-xs font-bold text-slate-400 px-2 font-mono">
+                                            0{currentIndex + 1} / 0{testimonials.length}
                                         </div>
-                                        <div className="text-xs sm:text-sm text-slate-500 font-normal">
-                                            {current.role}, <span className="text-[#2563EB] font-medium">{current.company}</span>
-                                        </div>
+                                        <button
+                                            onClick={nextSlide}
+                                            className="w-10 h-10 rounded-xl bg-slate-100 hover:bg-[#2563EB] hover:text-white text-slate-600 flex items-center justify-center transition-all duration-150 shadow-2xs cursor-pointer"
+                                            aria-label="Next Testimonial"
+                                        >
+                                            <ChevronRight className="w-5 h-5" />
+                                        </button>
                                     </div>
                                 </div>
                             </motion.div>
                         </AnimatePresence>
-
-                        {/* Navigation Buttons */}
-                        <div className="flex items-center justify-end space-x-2 pt-6 sm:pt-0 sm:absolute sm:bottom-12 sm:right-12">
-                            <button
-                                onClick={prevSlide}
-                                className="w-10 h-10 rounded-full border border-slate-200 bg-white hover:bg-slate-50 text-[#14213D] flex items-center justify-center shadow-xs transition-colors cursor-pointer"
-                                aria-label="Previous testimonial"
-                            >
-                                <ChevronLeft className="w-5 h-5" />
-                            </button>
-                            <button
-                                onClick={nextSlide}
-                                className="w-10 h-10 rounded-full border border-slate-200 bg-white hover:bg-slate-50 text-[#14213D] flex items-center justify-center shadow-xs transition-colors cursor-pointer"
-                                aria-label="Next testimonial"
-                            >
-                                <ChevronRight className="w-5 h-5" />
-                            </button>
-                        </div>
-                    </Card>
+                    </div>
                 </div>
 
-                {/* Logos / Client Strip */}
-                <div className="pt-8 border-t border-slate-200/80">
-                    <p className="text-center text-xs uppercase tracking-widest text-slate-400 font-bold mb-6">
-                        {t.testimonials.trustedBy}
+                {/* Infinite Auto-Scrolling Logo Marquee Track */}
+                <div className="pt-10 border-t border-slate-200/80">
+                    <p className="text-center text-xs font-bold text-slate-400 uppercase tracking-widest mb-6">
+                        {lang === 'ID' ? 'Dipercaya oleh Tim & Bisnis Berkembang' : 'Trusted by Fast-Growing Companies'}
                     </p>
-                    <div className="flex flex-wrap items-center justify-center gap-8 sm:gap-12 opacity-60">
-                        {clientLogos.map((logo) => (
-                            <span key={logo} className="font-black text-slate-400 tracking-wider text-sm sm:text-base font-mono">
-                                {logo}
-                            </span>
-                        ))}
+                    
+                    {/* Marquee viewport with gradient mask on left and right */}
+                    <div className="relative overflow-hidden w-full py-2 [mask-image:linear-gradient(to_right,transparent,black_10%,black_90%,transparent)]">
+                        <motion.div 
+                            className="flex items-center space-x-8 sm:space-x-12 w-max"
+                            animate={{ x: ['0%', '-50%'] }}
+                            transition={{
+                                duration: 22,
+                                repeat: Infinity,
+                                ease: 'linear'
+                            }}
+                        >
+                            {/* Duplicate list 3 times for completely seamless infinite running ticker */}
+                            {[...clientLogos, ...clientLogos, ...clientLogos].map((logo, idx) => (
+                                <div 
+                                    key={idx} 
+                                    className="flex items-center space-x-2.5 px-4 py-2 rounded-xl bg-white border border-slate-200/85 shadow-2xs group hover:border-[#2563EB]/40 transition-colors shrink-0"
+                                >
+                                    <span className="w-2 h-2 rounded-full bg-[#2563EB]" />
+                                    <span className="font-mono font-extrabold text-xs sm:text-sm text-slate-600 tracking-wider group-hover:text-[#2563EB] transition-colors whitespace-nowrap">
+                                        {logo}
+                                    </span>
+                                </div>
+                            ))}
+                        </motion.div>
                     </div>
                 </div>
 

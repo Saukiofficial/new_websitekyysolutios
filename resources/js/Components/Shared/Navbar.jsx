@@ -33,7 +33,7 @@ const IDFlag = () => (
     </svg>
 );
 
-export default function Navbar() {
+export default function Navbar({ onOpenContact }) {
     const { lang, setLanguage, t } = useLanguage();
     const [isOpen, setIsOpen] = useState(false);
     const [activeNav, setActiveNav] = useState('Home');
@@ -174,12 +174,13 @@ export default function Navbar() {
                     </div>
 
                     {/* Contact Button */}
-                    <a href="#cta">
-                        <button className="px-6 py-2.5 rounded-[14px] bg-gradient-to-r from-[#2563EB] to-[#3B82F6] hover:from-[#1D4ED8] hover:to-[#2563EB] text-white text-sm font-semibold shadow-md shadow-blue-500/25 hover:shadow-lg hover:shadow-blue-500/35 hover:-translate-y-0.5 active:translate-y-0 transition-all duration-200 inline-flex items-center group cursor-pointer">
-                            <span>{t.nav.contactUs}</span>
-                            <ArrowRight className="w-4 h-4 ml-1.5 group-hover:translate-x-1 transition-transform" />
-                        </button>
-                    </a>
+                    <button 
+                        onClick={onOpenContact || (() => window.location.href = '#cta')}
+                        className="px-6 py-2.5 rounded-[14px] bg-gradient-to-r from-[#2563EB] to-[#3B82F6] hover:from-[#1D4ED8] hover:to-[#2563EB] text-white text-sm font-semibold shadow-md shadow-blue-500/25 hover:shadow-lg hover:shadow-blue-500/35 hover:-translate-y-0.5 active:translate-y-0 transition-all duration-200 inline-flex items-center group cursor-pointer"
+                    >
+                        <span>{t.nav.contactUs}</span>
+                        <ArrowRight className="w-4 h-4 ml-1.5 group-hover:translate-x-1 transition-transform" />
+                    </button>
                 </div>
 
                 {/* Mobile Menu Toggle Button */}
@@ -242,12 +243,13 @@ export default function Navbar() {
 
                     {/* Contact Action */}
                     <div className="pt-2">
-                        <a href="#cta" onClick={() => setIsOpen(false)} className="w-full block">
-                            <button className="w-full py-3 rounded-[14px] bg-gradient-to-r from-[#2563EB] to-[#3B82F6] text-white text-sm font-semibold shadow-md shadow-blue-500/25 flex items-center justify-center">
-                                <span>{t.nav.contactUs}</span>
-                                <ArrowRight className="w-4 h-4 ml-1.5" />
-                            </button>
-                        </a>
+                        <button 
+                            onClick={() => { setIsOpen(false); if (onOpenContact) onOpenContact(); else window.location.href = '#cta'; }}
+                            className="w-full py-3 rounded-[14px] bg-gradient-to-r from-[#2563EB] to-[#3B82F6] text-white text-sm font-semibold shadow-md shadow-blue-500/25 flex items-center justify-center cursor-pointer"
+                        >
+                            <span>{t.nav.contactUs}</span>
+                            <ArrowRight className="w-4 h-4 ml-1.5" />
+                        </button>
                     </div>
                 </div>
             )}
