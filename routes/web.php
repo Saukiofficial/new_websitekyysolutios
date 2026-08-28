@@ -5,6 +5,8 @@ use App\Http\Controllers\Web\MarketplaceController;
 use App\Http\Controllers\Web\ProductController;
 use App\Http\Controllers\Web\CheckoutController;
 use App\Http\Controllers\Auth\AuthController;
+use App\Http\Controllers\Auth\SellerAuthController;
+use App\Http\Controllers\Auth\AdminAuthController;
 use App\Http\Controllers\Admin\AdminDashboardController;
 use App\Http\Controllers\Admin\AdminProductController;
 use App\Http\Controllers\Admin\AdminOrderController;
@@ -19,6 +21,11 @@ use App\Http\Controllers\Admin\AdminContentController;
 use App\Http\Controllers\Admin\AdminNotificationController;
 use App\Http\Controllers\Admin\AdminSettingController;
 use App\Http\Controllers\Admin\AdminAnalyticsController;
+use App\Http\Controllers\User\UserDashboardController;
+use App\Http\Controllers\Seller\SellerDashboardController;
+use App\Http\Controllers\Seller\SellerProductController;
+use App\Http\Controllers\Seller\SellerWithdrawalController;
+use App\Http\Controllers\Seller\SellerStoreController;
 use App\Http\Controllers\Api\TrackingController;
 use Illuminate\Support\Facades\Route;
 
@@ -26,22 +33,64 @@ use Illuminate\Support\Facades\Route;
 Route::get('/', LandingPageController::class)->name('home');
 Route::get('/marketplace', [MarketplaceController::class, 'index'])->name('marketplace.index');
 Route::get('/products/{slug}', [ProductController::class, 'show'])->name('products.show');
+Route::get('/stores/{slug}', [SellerStoreController::class, 'showPublic'])->name('stores.show');
 
 // Direct Checkout & Order Routes
 Route::get('/checkout/{id?}', [CheckoutController::class, 'index'])->name('checkout.index');
 Route::post('/checkout', [CheckoutController::class, 'store'])->name('checkout.store');
 Route::get('/orders/{orderNumber}', [CheckoutController::class, 'success'])->name('orders.success');
 
+// Customer / Buyer Dashboard Routes
+Route::prefix('dashboard')->group(function () {
+    Route::get('/', fn() => redirect()->route('user.my-products'));
+    Route::get('/my-products', [UserDashboardController::class, 'myProducts'])->name('user.my-products');
+    Route::get('/orders', [UserDashboardController::class, 'orders'])->name('user.orders');
+    Route::post('/reviews', [UserDashboardController::class, 'submitReview'])->name('user.reviews.store');
+});
+
+// Seller / Vendor Partner Hub Routes
+Route::prefix('seller')->name('seller.')->group(function () {
+    // Dedicated Mitra Developer Authentication
+    Route::get('/login', [SellerAuthController::class, 'showLogin'])->name('login');
+    Route::post('/login', [SellerAuthController::class, 'login']);
+    Route::get('/register', [SellerAuthController::class, 'showRegister'])->name('register');
+    Route::post('/register', [SellerAuthController::class, 'register']);
+    Route::get('/auth/google', [SellerAuthController::class, 'redirectToGoogle'])->name('auth.google');
+
+    // Dashboard & Operations
+    Route::get('/', fn() => redirect()->route('seller.dashboard'));
+    Route::get('/dashboard', [SellerDashboardController::class, 'index'])->name('dashboard');
+    Route::get('/products', [SellerProductController::class, 'index'])->name('products');
+    Route::post('/products', [SellerProductController::class, 'store'])->name('products.store');
+    Route::delete('/products/{id}', [SellerProductController::class, 'destroy'])->name('products.destroy');
+    Route::get('/withdrawals', [SellerWithdrawalController::class, 'index'])->name('withdrawals');
+    Route::post('/withdrawals', [SellerWithdrawalController::class, 'store'])->name('withdrawals.store');
+    Route::get('/settings', [SellerStoreController::class, 'settings'])->name('settings');
+    Route::post('/settings', [SellerStoreController::class, 'update'])->name('settings.update');
+});
+
 // Lightweight Event & Visitor Tracking API
 Route::post('/api/track-event', [TrackingController::class, 'track'])->name('api.track');
 
-// Authentication Routes
+// Buyer / General Authentication Routes
 Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
 Route::post('/login', [AuthController::class, 'login']);
+Route::get('/register', [AuthController::class, 'showRegister'])->name('register');
+Route::post('/register', [AuthController::class, 'register']);
+Route::get('/auth/google', [AuthController::class, 'redirectToGoogle'])->name('auth.google');
+Route::get('/auth/google/callback', [AuthController::class, 'handleGoogleCallback'])->name('auth.google.callback');
+Route::get('/forgot-password', [AuthController::class, 'showForgotPassword'])->name('password.request');
+Route::post('/forgot-password', [AuthController::class, 'sendResetLink'])->name('password.email');
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
-// Super Admin Panel Routes (As defined in docs/Ui/superadmin_design.md)
+// Super Admin Panel Routes (As defined in docs/Ui/superadmin_design.md & design_login_admin.md)
 Route::prefix('admin')->name('admin.')->group(function () {
+    // Dedicated Super Admin Login
+    Route::get('/login', [AdminAuthController::class, 'showLogin'])->name('login');
+    Route::post('/login', [AdminAuthController::class, 'login']);
+
+    // Admin Operations
+    Route::get('/', fn() => redirect()->route('admin.dashboard'));
     Route::get('/dashboard', [AdminDashboardController::class, 'index'])->name('dashboard');
     
     // Products Management & Moderation

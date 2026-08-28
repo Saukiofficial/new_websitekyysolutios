@@ -343,11 +343,38 @@ class MarketplaceSeeder extends Seeder
                 $pData
             );
 
-            // Create / update delivery link
+            // Create multiple delivery channels (GitHub, Google Drive, Direct ZIP)
             ProductLink::updateOrCreate(
                 ['product_id' => $product->id, 'type' => 'github'],
                 [
                     'url' => $deliveryUrl,
+                    'version' => $product->version,
+                    'status' => 'active',
+                ]
+            );
+
+            ProductLink::updateOrCreate(
+                ['product_id' => $product->id, 'type' => 'gdrive'],
+                [
+                    'url' => 'https://drive.google.com/drive/folders/1kyy_' . md5($product->slug) . '?usp=sharing',
+                    'version' => $product->version,
+                    'status' => 'active',
+                ]
+            );
+
+            ProductLink::updateOrCreate(
+                ['product_id' => $product->id, 'type' => 'zip'],
+                [
+                    'url' => 'https://download.kyysolutions.com/packages/' . $product->slug . '-' . $product->version . '.zip',
+                    'version' => $product->version,
+                    'status' => 'active',
+                ]
+            );
+
+            ProductLink::updateOrCreate(
+                ['product_id' => $product->id, 'type' => 'docs'],
+                [
+                    'url' => 'https://docs.kyysolutions.com/setup/' . $product->slug,
                     'version' => $product->version,
                     'status' => 'active',
                 ]

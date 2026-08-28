@@ -419,18 +419,37 @@ export default function AdminProductsIndex({ products, categories, counts, filte
                                     />
                                 </div>
 
-                                <div>
-                                    <label className="font-bold text-[#0F172A] block mb-1">Tautan Delivery Privat (GitHub / Google Drive) *</label>
-                                    <input 
-                                        type="url" 
-                                        required
-                                        value={data.delivery_url}
-                                        onChange={(e) => setData('delivery_url', e.target.value)}
-                                        placeholder="https://github.com/kyysolutions/repo-private"
-                                        className="w-full h-10 px-3 rounded-xl border border-slate-200 focus:outline-none focus:border-blue-500 font-mono"
-                                    />
-                                    <p className="text-[10px] text-slate-400 mt-1">Tautan ini hanya akan diberikan kepada pembeli terverifikasi setelah order berstatus lunas.</p>
+                                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                                    <div>
+                                        <label className="font-bold text-[#0F172A] block mb-1">Penyedia File (Delivery Type) *</label>
+                                        <select
+                                            value={data.delivery_type || 'gdrive'}
+                                            onChange={(e) => setData('delivery_type', e.target.value)}
+                                            className="w-full h-10 px-3 rounded-xl border border-slate-200 focus:outline-none focus:border-blue-500 cursor-pointer text-xs font-semibold"
+                                        >
+                                            <option value="gdrive">📁 Google Drive (Folder/File)</option>
+                                            <option value="github">🐙 GitHub (Private Repo)</option>
+                                            <option value="zip">📥 Direct Download .ZIP</option>
+                                        </select>
+                                    </div>
+
+                                    <div className="sm:col-span-2">
+                                        <label className="font-bold text-[#0F172A] block mb-1">Link Source Code (Delivery URL) *</label>
+                                        <input 
+                                            type="url" 
+                                            required
+                                            value={data.delivery_url}
+                                            onChange={(e) => setData('delivery_url', e.target.value)}
+                                            placeholder={
+                                                data.delivery_type === 'gdrive' 
+                                                    ? 'https://drive.google.com/drive/folders/...' 
+                                                    : (data.delivery_type === 'github' ? 'https://github.com/org/repo-private' : 'https://domain.com/file.zip')
+                                            }
+                                            className="w-full h-10 px-3 rounded-xl border border-slate-200 focus:outline-none focus:border-blue-500 font-mono text-xs"
+                                        />
+                                    </div>
                                 </div>
+                                <p className="text-[10px] text-slate-400">Pilih salah satu (Google Drive atau GitHub). Tautan ini otomatis disajikan langsung ke pembeli terverifikasi setelah order berstatus lunas.</p>
 
                                 <div className="pt-4 border-t border-slate-100 flex items-center justify-end space-x-3">
                                     <button

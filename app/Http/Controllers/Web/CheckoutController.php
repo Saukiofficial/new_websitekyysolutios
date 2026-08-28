@@ -14,6 +14,8 @@ use Inertia\Inertia;
 use Inertia\Response;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Auth;
 
 class CheckoutController extends Controller
 {
@@ -74,12 +76,27 @@ class CheckoutController extends Controller
 
         // Transactional Database Insert
         $order = DB::transaction(function () use ($validated, $product, $orderNumber, $fee, $total) {
-            // Find or associate buyer user if logged in / exists
+            // Find or automatically create buyer user account
             $buyer = User::where('email', $validated['email'])->first();
+            
+            if (!$buyer) {
+                $buyer = User::create([
+                    'name' => $validated['name'],
+                    'email' => $validated['email'],
+                    'password' => Hash::make('Kyysolutions@' . rand(1000, 9999)),
+                    'role' => 'buyer',
+                    'status' => 'active',
+                ]);
+            }
+
+            // Auto-login buyer if not authenticated
+            if (!Auth::check()) {
+                Auth::login($buyer);
+            }
 
             // 1. Create Order
             $order = Order::create([
-                'buyer_id' => $buyer?->id,
+                'buyer_id' => $buyer->id,
                 'order_number' => $orderNumber,
                 'customer_name' => $validated['name'],
                 'customer_email' => $validated['email'],
@@ -90,7 +107,7 @@ class CheckoutController extends Controller
                 'total' => $total,
                 'currency' => 'IDR',
                 'payment_method' => $validated['payment_method'],
-                'status' => 'paid', // Instant auto-verified for demonstration
+                'status' => 'paid', // Instant auto-verified
                 'paid_at' => now(),
             ]);
 
@@ -121,7 +138,7 @@ class CheckoutController extends Controller
             // 4. Create Product Access & Commercial License
             $licenseKey = 'KYY-LIC-' . strtoupper(Str::random(4)) . '-' . strtoupper(Str::random(4)) . '-AUTH';
             ProductAccess::create([
-                'buyer_id' => $buyer?->id,
+                'buyer_id' => $buyer->id,
                 'buyer_email' => $validated['email'],
                 'product_id' => $product->id,
                 'order_id' => $order->id,

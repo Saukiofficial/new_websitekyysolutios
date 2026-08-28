@@ -86,7 +86,7 @@ class AdminProductController extends Controller
             'version' => 'required|string|max:20',
             'badge' => 'nullable|string|max:50',
             'short_description' => 'required|string',
-            'demo_url' => 'nullable|url',
+            'delivery_type' => 'nullable|string|in:gdrive,github,zip',
             'delivery_url' => 'required|url',
         ]);
 
@@ -115,7 +115,7 @@ class AdminProductController extends Controller
 
         ProductLink::create([
             'product_id' => $product->id,
-            'type' => 'github',
+            'type' => $validated['delivery_type'] ?? (str_contains($validated['delivery_url'], 'drive.google.com') ? 'gdrive' : (str_contains($validated['delivery_url'], 'github.com') ? 'github' : 'zip')),
             'url' => $validated['delivery_url'],
             'version' => $product->version,
             'status' => 'active',

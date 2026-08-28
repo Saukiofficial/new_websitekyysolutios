@@ -113,7 +113,14 @@ export default function Footer() {
                                 <a href="#portfolio" className="hover:text-white transition-colors">{t.portfolio.title}</a>
                             </li>
                             <li>
-                                <a href="#cta" className="hover:text-white transition-colors">{t.footer.careers}</a>
+                                <Link href="/seller/register" className="text-blue-400 hover:text-blue-300 font-semibold transition-colors">
+                                    Gabung Mitra Seller
+                                </Link>
+                            </li>
+                            <li>
+                                <Link href="/seller/login" className="hover:text-white transition-colors">
+                                    Seller Studio
+                                </Link>
                             </li>
                         </ul>
                     </div>

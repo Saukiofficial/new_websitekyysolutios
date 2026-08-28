@@ -171,12 +171,19 @@ export default function Navbar({ onOpenContact }) {
                         </AnimatePresence>
                     </div>
 
-                    {/* Login Portal Link */}
+                    {/* Login & Register Links */}
                     <Link
                         href="/login"
-                        className="px-3.5 py-1.5 text-xs font-bold text-slate-700 hover:text-[#2563EB] rounded-xl hover:bg-slate-100/80 transition-colors inline-flex items-center space-x-1.5"
+                        className="px-3.5 py-1.5 text-xs font-bold text-slate-700 hover:text-[#2563EB] rounded-xl hover:bg-slate-100/80 transition-colors inline-flex items-center space-x-1"
                     >
                         <span>{lang === 'ID' ? 'Masuk' : 'Login'}</span>
+                    </Link>
+
+                    <Link
+                        href="/register"
+                        className="px-3.5 py-1.5 text-xs font-bold text-[#2563EB] bg-blue-50 hover:bg-blue-100/70 border border-blue-200/60 rounded-xl transition-colors inline-flex items-center space-x-1"
+                    >
+                        <span>{lang === 'ID' ? 'Daftar' : 'Register'}</span>
                     </Link>
 
                     {/* Contact Button */}

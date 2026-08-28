@@ -1,50 +1,27 @@
 import { useState } from 'react';
-import { Head, Link, useForm } from '@inertiajs/react';
-import { motion } from 'framer-motion';
+import { Head, useForm, Link } from '@inertiajs/react';
 import { 
-    ShieldCheck, 
+    ShoppingBag, 
     Mail, 
     Lock, 
-    LockKeyhole, 
     Eye, 
     EyeOff, 
-    KeyRound, 
-    TrendingUp, 
-    Globe, 
-    ArrowLeft, 
-    ChartNoAxesCombined, 
-    UsersRound, 
-    WalletCards, 
-    CheckCircle2, 
-    AlertCircle,
+    Download, 
+    ShieldCheck, 
+    Globe,
+    FolderGit2,
+    Store,
     Loader2
 } from 'lucide-react';
 
 export default function Login() {
     const [showPassword, setShowPassword] = useState(false);
-    const [otpSent, setOtpSent] = useState(false);
 
     const { data, setData, post, processing, errors } = useForm({
-        email: 'admin@kyysolutions.com',
-        password: 'password123',
-        otp: '',
-        remember: true,
+        email: '',
+        password: '',
+        remember: false,
     });
-
-    const handleSendOtp = () => {
-        setOtpSent(true);
-        setData('otp', '884210');
-    };
-
-    const fillAdminCredentials = () => {
-        setData({
-            email: 'admin@kyysolutions.com',
-            password: 'password123',
-            otp: '884210',
-            remember: true,
-        });
-        setOtpSent(true);
-    };
 
     const handleSubmit = (e) => {
         e.preventDefault();
@@ -52,358 +29,183 @@ export default function Login() {
     };
 
     return (
-        <div className="min-h-screen bg-[#F8FAFC] text-[#0F172A] p-3 sm:p-5 lg:p-6 flex items-center justify-center font-sans antialiased selection:bg-[#2563EB] selection:text-white">
-            <Head>
-                <title>Masuk Super Admin — KyySolutions</title>
-            </Head>
+        <div className="min-h-screen bg-[#F8FAFC] flex items-center justify-center p-3 sm:p-5 lg:p-6 antialiased selection:bg-blue-600 selection:text-white font-sans">
+            <Head title="Masuk Akun Pembeli — KyySolutions Marketplace" />
 
-            {/* Split Screen Master Container */}
-            <div className="w-full max-w-[1560px] min-h-[calc(100vh-40px)] flex flex-col lg:flex-row bg-white rounded-2xl lg:rounded-3xl border border-[#E2E8F0] shadow-sm overflow-hidden">
+            <div className="w-full max-w-[1240px] min-h-[calc(100vh-48px)] bg-white rounded-2xl sm:rounded-[24px] border border-slate-200 shadow-xl overflow-hidden flex flex-col lg:flex-row">
                 
                 {/* ═══════════════════════════════════════════════════════
-                    1. LEFT DARK BRAND & HERO PANEL (58% desktop ratio)
+                    1. LEFT BUYER HERO PANEL
                    ═══════════════════════════════════════════════════════ */}
-                <div 
-                    className="hidden lg:flex lg:w-[56%] xl:w-[58%] flex-col justify-between p-8 xl:p-12 2xl:p-14 relative overflow-hidden text-white shrink-0"
-                    style={{
-                        background: 'linear-gradient(180deg, #06152E 0%, #071A38 52%, #041126 100%)',
-                    }}
-                >
-                    {/* Background Subtle Highlights & Glows */}
-                    <div className="absolute top-0 right-0 w-[450px] h-[350px] bg-blue-600/15 blur-[100px] pointer-events-none" />
-                    <div className="absolute bottom-10 left-10 w-[350px] h-[250px] bg-indigo-600/10 blur-[80px] pointer-events-none" />
-
-                    {/* Subtle Blueprint Grid Pattern */}
-                    <div 
-                        className="absolute inset-0 opacity-[0.035] pointer-events-none"
-                        style={{
-                            backgroundImage: 'radial-gradient(circle at 1px 1px, #60A5FA 1px, transparent 0)',
-                            backgroundSize: '24px 24px'
-                        }}
-                    />
-
-                    {/* Top Left: Brand Area */}
+                <div className="lg:w-[50%] bg-gradient-to-br from-[#0F172A] via-[#1E293B] to-[#0F172A] p-8 sm:p-12 lg:p-14 text-white flex flex-col justify-between relative overflow-hidden">
+                    
                     <div className="relative z-10">
-                        <Link href="/" className="inline-flex items-center space-x-3 group">
-                            <img 
-                                src="/images/logo/logo_no_bg.png" 
-                                alt="KyySolutions Logo" 
-                                className="h-10 w-auto object-contain drop-shadow-sm group-hover:scale-105 transition-transform" 
-                            />
-                            <span className="font-extrabold text-xl text-white tracking-tight">
-                                Kyy<span className="text-[#3B82F6]">Solutions</span>
-                            </span>
+                        <Link href="/" className="flex items-center space-x-3 group">
+                            <img src="/images/logo/logo_no_bg.png" alt="KyySolutions Logo" className="h-9 w-auto object-contain" />
+                            <div className="flex flex-col">
+                                <span className="text-xl font-extrabold text-white tracking-tight">
+                                    Kyy<span className="text-[#3B82F6]">Solutions</span>
+                                </span>
+                                <span className="text-[10px] font-bold text-slate-400 tracking-widest uppercase -mt-0.5">
+                                    Buyer Hub
+                                </span>
+                            </div>
                         </Link>
                     </div>
 
-                    {/* Middle Section: Hero Copy & Feature Cards + Visual Layout */}
-                    <div className="my-auto py-8 relative z-10 grid grid-cols-1 xl:grid-cols-12 gap-8 items-center">
+                    <div className="relative z-10 my-8 space-y-6 max-w-[440px]">
                         
-                        {/* Copy & Feature Cards (7 cols) */}
-                        <div className="xl:col-span-7 space-y-6">
-                            
-                            {/* Eyebrow Badge */}
-                            <div className="inline-flex items-center space-x-2 h-8 px-3 rounded-md bg-blue-600/20 border border-blue-400/20 text-[#60A5FA] text-xs font-semibold tracking-wide">
-                                <ShieldCheck className="w-4 h-4 text-[#60A5FA]" />
-                                <span>PANEL SUPER ADMIN</span>
-                            </div>
-
-                            {/* Hero Title */}
-                            <h1 className="text-3xl xl:text-4xl 2xl:text-[44px] font-bold text-white tracking-tight leading-[1.15] max-w-[500px]">
-                                Panel Super Admin <br />
-                                <span className="text-transparent bg-clip-text bg-gradient-to-r from-white via-slate-100 to-blue-300">
-                                    KyySolutions
-                                </span>
-                            </h1>
-
-                            {/* Hero Description */}
-                            <p className="text-sm xl:text-base text-[#D5DEEB] leading-relaxed max-w-[460px]">
-                                Kelola marketplace, layanan, produk digital, seller, transaksi, dan operasional platform dalam satu pusat kontrol.
-                            </p>
-
-                            {/* 3 Vertical Feature Cards */}
-                            <div className="space-y-3 pt-2 max-w-[420px]">
-                                
-                                {/* Card 1: Revenue Monitoring */}
-                                <div className="p-3.5 rounded-xl bg-white/[0.035] border border-white/[0.07] hover:bg-white/[0.055] transition-colors flex items-start space-x-3.5">
-                                    <div className="w-10 h-10 rounded-xl bg-blue-600/20 text-[#60A5FA] flex items-center justify-center shrink-0 border border-blue-500/20">
-                                        <ChartNoAxesCombined className="w-5 h-5" />
-                                    </div>
-                                    <div>
-                                        <h3 className="text-xs font-bold text-white">Monitoring Revenue</h3>
-                                        <p className="text-[11px] text-[#8EA0B8] leading-normal mt-0.5">
-                                            Pantau pendapatan, order, dan performa platform secara real-time.
-                                        </p>
-                                    </div>
-                                </div>
-
-                                {/* Card 2: Moderasi Produk & Seller */}
-                                <div className="p-3.5 rounded-xl bg-white/[0.035] border border-white/[0.07] hover:bg-white/[0.055] transition-colors flex items-start space-x-3.5">
-                                    <div className="w-10 h-10 rounded-xl bg-purple-600/20 text-[#A78BFA] flex items-center justify-center shrink-0 border border-purple-500/20">
-                                        <UsersRound className="w-5 h-5" />
-                                    </div>
-                                    <div>
-                                        <h3 className="text-xs font-bold text-white">Moderasi Produk & Seller</h3>
-                                        <p className="text-[11px] text-[#8EA0B8] leading-normal mt-0.5">
-                                            Kelola dan moderasi produk, seller, serta konten untuk menjaga kualitas platform.
-                                        </p>
-                                    </div>
-                                </div>
-
-                                {/* Card 3: Kontrol Pembayaran & Withdrawal */}
-                                <div className="p-3.5 rounded-xl bg-white/[0.035] border border-white/[0.07] hover:bg-white/[0.055] transition-colors flex items-start space-x-3.5">
-                                    <div className="w-10 h-10 rounded-xl bg-emerald-600/20 text-[#4ADE80] flex items-center justify-center shrink-0 border border-emerald-500/20">
-                                        <WalletCards className="w-5 h-5" />
-                                    </div>
-                                    <div>
-                                        <h3 className="text-xs font-bold text-white">Kontrol Pembayaran & Withdrawal</h3>
-                                        <p className="text-[11px] text-[#8EA0B8] leading-normal mt-0.5">
-                                            Kontrol pembayaran, komisi, dan withdrawal dengan sistem yang aman dan transparan.
-                                        </p>
-                                    </div>
-                                </div>
-
-                            </div>
-
+                        <div className="inline-flex items-center space-x-2 px-3 py-1.5 rounded-xl bg-blue-500/15 border border-blue-400/20 text-[#60A5FA] text-xs font-bold">
+                            <ShoppingBag className="w-3.5 h-3.5 text-[#60A5FA]" />
+                            <span>Portal Pembeli & Klien</span>
                         </div>
 
-                        {/* Visual Analytics Floating Illustration (5 cols) */}
-                        <div className="xl:col-span-5 hidden 2xl:flex flex-col items-center justify-center relative min-h-[380px]">
-                            
-                            {/* Card 1: Mini Total Orders Card (Floating Top-Right) */}
-                            <motion.div 
-                                initial={{ opacity: 0, y: -10 }}
-                                animate={{ opacity: 1, y: 0 }}
-                                transition={{ duration: 0.5, delay: 0.2 }}
-                                className="absolute top-2 right-4 p-3.5 rounded-xl bg-white/95 text-slate-900 border border-white/40 shadow-xl w-36 z-20 backdrop-blur-md rotate-2"
-                            >
-                                <span className="text-[10px] font-semibold text-slate-500 block">Total Orders</span>
-                                <span className="text-base font-black text-slate-900 font-mono block mt-0.5">3.842</span>
-                                <span className="text-[10px] font-bold text-emerald-600 inline-flex items-center mt-0.5">
-                                    <TrendingUp className="w-3 h-3 mr-0.5" /> +12.4%
-                                </span>
-                            </motion.div>
+                        <div className="space-y-3">
+                            <h1 className="text-3xl sm:text-4xl font-extrabold text-white leading-tight tracking-tight">
+                                Unduh Source Code & Kelola Software Anda
+                            </h1>
+                            <p className="text-sm text-slate-300 leading-relaxed">
+                                Akses file unduhan Google Drive / GitHub, cek riwayat faktur pesanan, dan dapatkan update versi terbaru produk digital Anda.
+                            </p>
+                        </div>
 
-                            {/* Card 2: Main Revenue Card (Middle) */}
-                            <motion.div 
-                                initial={{ opacity: 0, scale: 0.95 }}
-                                animate={{ opacity: 1, scale: 1 }}
-                                transition={{ duration: 0.5 }}
-                                className="w-72 p-5 rounded-2xl bg-white/95 text-slate-900 border border-white/40 shadow-2xl z-10 backdrop-blur-md -rotate-2"
-                            >
-                                <div className="flex items-center justify-between mb-2">
-                                    <span className="text-xs font-semibold text-slate-500">Total Revenue</span>
-                                    <span className="text-[10px] font-bold bg-emerald-100 text-emerald-800 px-1.5 py-0.5 rounded">+18.6%</span>
+                        {/* Value Highlights */}
+                        <div className="space-y-3 pt-2">
+                            <div className="p-3.5 rounded-xl bg-white/[0.04] border border-white/[0.08] flex items-center space-x-3">
+                                <div className="w-9 h-9 rounded-lg bg-blue-500/20 text-[#60A5FA] flex items-center justify-center shrink-0">
+                                    <Download className="w-4 h-4" />
                                 </div>
-                                <div className="text-lg font-black text-[#0F172A] font-mono">
-                                    Rp 1.248.750.000
+                                <div>
+                                    <h4 className="text-xs font-bold text-white">Unduh Instan Kapan Saja</h4>
+                                    <p className="text-[11px] text-slate-400">Akses langsung ke Google Drive & GitHub tanpa batas waktu.</p>
                                 </div>
+                            </div>
 
-                                {/* Upward Blue Chart Path */}
-                                <div className="h-16 w-full mt-3 relative">
-                                    <svg className="w-full h-full overflow-visible" viewBox="0 0 200 60">
-                                        <defs>
-                                            <linearGradient id="miniArea" x1="0" y1="0" x2="0" y2="1">
-                                                <stop offset="0%" stopColor="#2563EB" stopOpacity="0.3" />
-                                                <stop offset="100%" stopColor="#2563EB" stopOpacity="0.0" />
-                                            </linearGradient>
-                                        </defs>
-                                        <path d="M 0,55 L 30,45 L 60,48 L 90,32 L 120,35 L 150,18 L 200,8 L 200,60 L 0,60 Z" fill="url(#miniArea)" />
-                                        <path d="M 0,55 L 30,45 L 60,48 L 90,32 L 120,35 L 150,18 L 200,8" fill="none" stroke="#2563EB" strokeWidth="2.5" strokeLinecap="round" />
-                                    </svg>
+                            <div className="p-3.5 rounded-xl bg-white/[0.04] border border-white/[0.08] flex items-center space-x-3">
+                                <div className="w-9 h-9 rounded-lg bg-emerald-500/20 text-emerald-400 flex items-center justify-center shrink-0">
+                                    <ShieldCheck className="w-4 h-4" />
                                 </div>
-                            </motion.div>
-
-                            {/* Card 3: Mini Donut Breakdown (Bottom Left) */}
-                            <motion.div 
-                                initial={{ opacity: 0, y: 10 }}
-                                animate={{ opacity: 1, y: 0 }}
-                                transition={{ duration: 0.5, delay: 0.3 }}
-                                className="absolute bottom-0 left-2 p-3 rounded-xl bg-white/95 text-slate-900 border border-white/40 shadow-xl w-48 z-20 backdrop-blur-md rotate-1"
-                            >
-                                <span className="text-[10px] font-bold text-slate-700 block mb-1.5">Sumber Revenue</span>
-                                <div className="space-y-1 text-[9px] font-medium text-slate-600">
-                                    <div className="flex justify-between items-center">
-                                        <span className="flex items-center"><span className="w-1.5 h-1.5 rounded-full bg-[#2563EB] mr-1" /> Produk Digital</span>
-                                        <span className="font-mono font-bold">63%</span>
-                                    </div>
-                                    <div className="flex justify-between items-center">
-                                        <span className="flex items-center"><span className="w-1.5 h-1.5 rounded-full bg-[#22C55E] mr-1" /> Services</span>
-                                        <span className="font-mono font-bold">25%</span>
-                                    </div>
-                                    <div className="flex justify-between items-center">
-                                        <span className="flex items-center"><span className="w-1.5 h-1.5 rounded-full bg-[#F59E0B] mr-1" /> Marketplace</span>
-                                        <span className="font-mono font-bold">12%</span>
-                                    </div>
+                                <div>
+                                    <h4 className="text-xs font-bold text-white">Garansi Kode Bersih & Terverifikasi</h4>
+                                    <p className="text-[11px] text-slate-400">Seluruh software telah diaudit bebas dari bug dan malware.</p>
                                 </div>
-                            </motion.div>
-
+                            </div>
                         </div>
 
                     </div>
 
-                    {/* Bottom Security Note */}
-                    <div className="relative z-10 pt-4 border-t border-white/10 flex items-center space-x-2 text-xs text-[#8EA0B8]">
-                        <ShieldCheck className="w-4 h-4 text-blue-400 shrink-0" />
-                        <span>Keamanan tingkat enterprise untuk melindungi data dan operasional platform.</span>
+                    <div className="relative z-10 pt-4 border-t border-white/10 flex items-center justify-between text-xs text-slate-400">
+                        <span>KyySolutions Digital Ecosystem</span>
+                        <Link href="/seller/login" className="text-blue-400 font-bold hover:underline flex items-center space-x-1">
+                            <Store className="w-3.5 h-3.5 mr-1" />
+                            <span>Portal Mitra Developer ➔</span>
+                        </Link>
                     </div>
 
                 </div>
 
                 {/* ═══════════════════════════════════════════════════════
-                    2. RIGHT LOGIN AREA (42% desktop ratio)
+                    2. RIGHT BUYER LOGIN FORM
                    ═══════════════════════════════════════════════════════ */}
-                <div className="flex-1 bg-[#F8FAFC] p-6 sm:p-10 lg:p-12 xl:p-14 flex flex-col justify-between overflow-y-auto">
+                <div className="lg:w-[50%] p-6 sm:p-10 lg:p-12 flex flex-col justify-between bg-white overflow-y-auto">
                     
-                    {/* Top Controls: Secure Badge + 1-Click Demo Fill */}
-                    <div className="flex items-center justify-between gap-3 mb-6">
-                        <div className="inline-flex items-center space-x-1.5 px-3 py-1 rounded-lg bg-white border border-[#E2E8F0] text-xs font-semibold text-slate-700 shadow-2xs">
-                            <LockKeyhole className="w-3.5 h-3.5 text-[#2563EB]" />
-                            <span>Secure Admin Access</span>
-                        </div>
-
-                        <button
-                            type="button"
-                            onClick={fillAdminCredentials}
-                            className="inline-flex items-center space-x-1.5 px-3 py-1.5 rounded-lg bg-blue-50 hover:bg-blue-100 border border-blue-200 text-[#2563EB] text-xs font-bold transition-colors cursor-pointer shadow-2xs"
-                        >
-                            <span>1-Click Auto Fill</span>
-                        </button>
+                    <div className="flex items-center justify-between pb-4">
+                        <span className="text-xs text-slate-500">
+                            Belum punya akun?{' '}
+                            <Link href="/register" className="font-bold text-[#2563EB] hover:underline">
+                                Daftar Akun Pembeli
+                            </Link>
+                        </span>
+                        <Link href="/seller/login" className="text-xs font-bold text-slate-600 hover:text-[#2563EB]">
+                            Masuk Seller
+                        </Link>
                     </div>
 
-                    {/* Login Card Container */}
-                    <div className="w-full max-w-[480px] mx-auto my-auto bg-white rounded-2xl border border-[#E2E8F0] p-6 sm:p-9 shadow-md shadow-slate-900/4">
+                    <div className="my-auto py-4 max-w-md w-full mx-auto space-y-6">
                         
-                        {/* Security Icon Circle */}
-                        <div className="flex justify-center mb-4">
-                            <div className="w-16 h-16 rounded-full bg-[#EFF6FF] border-4 border-blue-50 flex items-center justify-center text-[#2563EB] shadow-xs">
-                                <ShieldCheck className="w-8 h-8 text-[#2563EB]" />
-                            </div>
-                        </div>
-
-                        {/* Heading & Subtitle */}
-                        <div className="text-center mb-6">
-                            <h2 className="text-2xl font-bold text-[#0F172A] tracking-tight">
-                                Masuk Super Admin
+                        <div>
+                            <h2 className="text-2xl sm:text-3xl font-extrabold text-[#0F172A] tracking-tight">
+                                Masuk Akun Pembeli
                             </h2>
-                            <p className="text-xs sm:text-sm text-[#64748B] mt-1 font-medium">
-                                Masuk untuk mengakses panel administrasi KyySolutions.
+                            <p className="text-xs sm:text-sm text-slate-500 mt-1">
+                                Masuk untuk mengakses produk software dan file source code Anda.
                             </p>
                         </div>
 
-                        {/* Generic Login Error Alert */}
+                        {/* 1-Click Google OAuth for Buyer */}
+                        <a
+                            href="/auth/google"
+                            className="w-full h-11 px-4 rounded-xl bg-white hover:bg-slate-50 border border-slate-200 hover:border-slate-300 text-slate-700 font-bold text-xs flex items-center justify-center space-x-2.5 transition-all shadow-xs"
+                        >
+                            <svg className="w-4 h-4" viewBox="0 0 24 24">
+                                <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" />
+                                <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" />
+                                <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z" />
+                                <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z" />
+                            </svg>
+                            <span>Masuk Cepat dengan Akun Google</span>
+                        </a>
+
+                        <div className="flex items-center space-x-3 text-slate-300">
+                            <div className="flex-1 border-b border-slate-200" />
+                            <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400">atau dengan email</span>
+                            <div className="flex-1 border-b border-slate-200" />
+                        </div>
+
+                        {/* Error Alert */}
                         {errors.email && (
-                            <div className="mb-5 p-3 rounded-xl bg-[#FEF2F2] border border-[#FECACA] text-[#991B1B] text-xs flex items-start space-x-2">
-                                <AlertCircle className="w-4 h-4 text-red-600 shrink-0 mt-0.5" />
-                                <div>
-                                    <div className="font-bold">Login gagal</div>
-                                    <div>{errors.email}</div>
-                                </div>
+                            <div className="p-3.5 bg-red-50 border border-red-200 text-red-700 rounded-xl text-xs font-medium">
+                                {errors.email}
                             </div>
                         )}
 
-                        {/* Login Form */}
-                        <form onSubmit={handleSubmit} className="space-y-4 text-left">
-                            
-                            {/* 1. Email Field */}
+                        <form onSubmit={handleSubmit} className="space-y-4 text-xs">
                             <div>
-                                <label className="text-xs font-semibold text-[#0F172A] block mb-1.5">
-                                    Email
+                                <label className="block text-xs font-semibold text-[#0F172A] mb-1.5">
+                                    Email Anda
                                 </label>
                                 <div className="relative">
                                     <Mail className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
-                                    <input
+                                    <input 
                                         type="email"
                                         required
-                                        autoComplete="username"
                                         value={data.email}
                                         onChange={(e) => setData('email', e.target.value)}
-                                        placeholder="admin@kyysolutions.com"
-                                        className="w-full h-11 pl-10 pr-3.5 text-xs sm:text-sm bg-white border border-[#CBD5E1] rounded-xl text-[#0F172A] focus:outline-none focus:border-[#60A5FA] focus:ring-3 focus:ring-blue-500/10 transition-all font-medium"
+                                        placeholder="nama@email.com"
+                                        className="w-full h-11 pl-10 pr-3.5 text-xs sm:text-sm bg-white border border-[#CBD5E1] rounded-xl text-[#0F172A] focus:outline-none focus:border-[#2563EB] focus:ring-3 focus:ring-blue-500/10 font-medium"
                                     />
                                 </div>
                             </div>
 
-                            {/* 2. Password Field */}
                             <div>
                                 <div className="flex items-center justify-between mb-1.5">
                                     <label className="text-xs font-semibold text-[#0F172A]">
-                                        Password
+                                        Kata Sandi
                                     </label>
-                                    <a href="#" className="text-xs font-semibold text-[#2563EB] hover:underline">
-                                        Lupa password?
-                                    </a>
+                                    <Link href="/forgot-password" className="text-[11px] font-medium text-[#2563EB] hover:underline">
+                                        Lupa kata sandi?
+                                    </Link>
                                 </div>
                                 <div className="relative">
                                     <Lock className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
-                                    <input
+                                    <input 
                                         type={showPassword ? 'text' : 'password'}
                                         required
-                                        autoComplete="current-password"
                                         value={data.password}
                                         onChange={(e) => setData('password', e.target.value)}
                                         placeholder="••••••••"
-                                        className="w-full h-11 pl-10 pr-10 text-xs sm:text-sm bg-white border border-[#CBD5E1] rounded-xl text-[#0F172A] focus:outline-none focus:border-[#60A5FA] focus:ring-3 focus:ring-blue-500/10 transition-all font-medium"
+                                        className="w-full h-11 pl-10 pr-10 text-xs sm:text-sm bg-white border border-[#CBD5E1] rounded-xl text-[#0F172A] focus:outline-none focus:border-[#2563EB] focus:ring-3 focus:ring-blue-500/10 font-medium"
                                     />
                                     <button
                                         type="button"
                                         onClick={() => setShowPassword(!showPassword)}
-                                        className="w-8 h-8 rounded-lg absolute right-1.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 flex items-center justify-center cursor-pointer transition-colors"
-                                        aria-label={showPassword ? 'Hide password' : 'Show password'}
+                                        className="w-8 h-8 rounded-lg absolute right-1.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 flex items-center justify-center cursor-pointer"
                                     >
                                         {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                                     </button>
                                 </div>
                             </div>
 
-                            {/* 3. OTP Code Field (Optional Security Token) */}
-                            <div>
-                                <div className="flex items-center justify-between mb-1.5">
-                                    <label className="text-xs font-semibold text-[#0F172A] flex items-center space-x-1">
-                                        <span>Kode Verifikasi / OTP</span>
-                                        <span className="text-[10px] text-slate-400 font-normal">(Opsional)</span>
-                                    </label>
-                                    {!otpSent ? (
-                                        <button
-                                            type="button"
-                                            onClick={handleSendOtp}
-                                            className="text-xs font-bold text-[#2563EB] hover:underline cursor-pointer"
-                                        >
-                                            Kirim OTP
-                                        </button>
-                                    ) : (
-                                        <span className="text-[10px] font-bold text-emerald-600 flex items-center">
-                                            <CheckCircle2 className="w-3 h-3 mr-0.5" /> OTP Terkirim (884210)
-                                        </span>
-                                    )}
-                                </div>
-                                <div className="relative">
-                                    <KeyRound className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
-                                    <input
-                                        type="text"
-                                        autoComplete="one-time-code"
-                                        value={data.otp}
-                                        onChange={(e) => setData('otp', e.target.value)}
-                                        placeholder="Masukkan 6-digit kode OTP"
-                                        className="w-full h-11 pl-10 pr-3.5 text-xs sm:text-sm bg-white border border-[#CBD5E1] rounded-xl text-[#0F172A] focus:outline-none focus:border-[#60A5FA] focus:ring-3 focus:ring-blue-500/10 transition-all font-mono"
-                                    />
-                                </div>
-                            </div>
-
-                            {/* 4. Remember Me */}
-                            <div className="pt-1">
-                                <label className="flex items-center space-x-2 cursor-pointer select-none">
-                                    <input
-                                        type="checkbox"
-                                        checked={data.remember}
-                                        onChange={(e) => setData('remember', e.target.checked)}
-                                        className="w-4 h-4 rounded border-[#CBD5E1] text-[#2563EB] focus:ring-blue-500 cursor-pointer"
-                                    />
-                                    <span className="text-xs font-medium text-slate-700">Ingat saya</span>
-                                </label>
-                            </div>
-
-                            {/* 5. Primary Login Button */}
                             <div className="pt-2">
                                 <button
                                     type="submit"
@@ -413,43 +215,29 @@ export default function Login() {
                                     {processing ? (
                                         <>
                                             <Loader2 className="w-4 h-4 animate-spin" />
-                                            <span>Memverifikasi...</span>
+                                            <span>Masuk...</span>
                                         </>
                                     ) : (
                                         <>
-                                            <LockKeyhole className="w-4 h-4" />
-                                            <span>Masuk ke Dashboard</span>
+                                            <ShoppingBag className="w-4 h-4" />
+                                            <span>Masuk ke Buyer Hub</span>
                                         </>
                                     )}
                                 </button>
                             </div>
-
-                            {/* 6. Secondary Website Button */}
-                            <div>
-                                <Link
-                                    href="/"
-                                    className="w-full h-11 rounded-xl bg-white hover:bg-slate-50 border border-[#CBD5E1] text-[#0F172A] text-xs font-bold flex items-center justify-center space-x-2 transition-colors"
-                                >
-                                    <Globe className="w-4 h-4 text-slate-500" />
-                                    <span>Kembali ke Website</span>
-                                </Link>
-                            </div>
-
-                            {/* 7. Bottom Security Note */}
-                            <div className="pt-3 text-center">
-                                <p className="text-[11px] text-[#64748B] flex items-center justify-center space-x-1 font-medium">
-                                    <Lock className="w-3 h-3 text-slate-400 shrink-0" />
-                                    <span>Akses terbatas hanya untuk administrator yang berwenang.</span>
-                                </p>
-                            </div>
-
                         </form>
+
+                        <div className="pt-2 text-center text-xs text-slate-500">
+                            Mau menjual software karya Anda?{' '}
+                            <Link href="/seller/register" className="font-bold text-[#2563EB] hover:underline">
+                                Buka Toko Mitra Developer
+                            </Link>
+                        </div>
 
                     </div>
 
-                    {/* Bottom Copyright */}
-                    <div className="text-center text-[11px] text-slate-400 font-medium mt-6">
-                        © {new Date().getFullYear()} KyySolutions Platform. All rights reserved.
+                    <div className="text-center text-[11px] text-slate-400 font-medium pt-4">
+                        KyySolutions Buyer Hub
                     </div>
 
                 </div>
