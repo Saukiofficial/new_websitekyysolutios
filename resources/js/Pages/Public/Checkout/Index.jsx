@@ -147,7 +147,7 @@ export default function CheckoutIndex({ product, productId }) {
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        post(route('checkout.store'));
+        post('/checkout');
     };
 
     const formatRupiah = (number) => {

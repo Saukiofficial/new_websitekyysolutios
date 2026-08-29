@@ -172,27 +172,24 @@ class CheckoutController extends Controller
 
         [$createdOrder, $buyerUser] = $order;
 
-        // Generate Midtrans Snap Transaction Token
-        $snapResult = $this->midtransService->createSnapTransaction($createdOrder, $product, $buyerUser, $total);
-        
-        $createdOrder->snap_token = $snapResult['token'] ?? null;
-        $createdOrder->payment_url = $snapResult['redirect_url'] ?? null;
+        // Charge transaction via Midtrans Core API directly for seamless in-app display
+        $chargeResult = $this->midtransService->chargeTransaction(
+            $createdOrder, 
+            $product, 
+            $buyerUser, 
+            $total, 
+            $validated['payment_method']
+        );
 
-        // If mock mode (no midtrans keys entered yet), auto-settle for seamless local testing
-        if (!empty($snapResult['is_mock'])) {
-            $this->midtransService->processOrderSettlement($createdOrder, [
-                'transaction_id' => 'MID-MOCK-' . strtoupper(Str::random(8)),
-                'payment_type' => $validated['payment_method'],
-            ]);
-        } else {
-            $createdOrder->save();
-        }
+        $paymentDetails = $chargeResult['details'] ?? [];
 
-        return redirect()->route('orders.success', ['orderNumber' => $createdOrder->order_number])->with([
-            'snap_token' => $createdOrder->snap_token,
-            'payment_url' => $createdOrder->payment_url,
-            'is_mock' => $snapResult['is_mock'] ?? false,
+        // Save raw details into payment record
+        Payment::where('order_id', $createdOrder->id)->update([
+            'provider_reference' => $paymentDetails['transactionId'] ?? ('MID-' . strtoupper(Str::random(10))),
+            'raw_reference' => $paymentDetails,
         ]);
+
+        return redirect()->route('orders.success', ['orderNumber' => $createdOrder->order_number]);
     }
 
     /**
@@ -265,11 +262,16 @@ class CheckoutController extends Controller
      */
     public function success(Request $request, string $orderNumber): Response
     {
-        $orderModel = Order::with(['items.product.category', 'accesses'])->where('order_number', $orderNumber)->first();
+        $orderModel = Order::with(['items.product.category', 'accesses', 'payments'])->where('order_number', $orderNumber)->first();
 
         if ($orderModel) {
             $firstItem = $orderModel->items->first();
             $access = $orderModel->accesses->first();
+            $latestPayment = $orderModel->payments->first();
+            
+            $rawDetails = is_array($latestPayment?->raw_reference) 
+                ? $latestPayment->raw_reference 
+                : json_decode($latestPayment?->raw_reference ?? '{}', true);
 
             $order = [
                 'orderNumber' => $orderModel->order_number,
@@ -289,6 +291,7 @@ class CheckoutController extends Controller
                 'fee' => $orderModel->payment_fee,
                 'total' => $orderModel->total,
                 'status' => $orderModel->status,
+                'paymentDetails' => $rawDetails ?: [],
                 'snapToken' => $orderModel->snap_token,
                 'paymentUrl' => $orderModel->payment_url,
                 'licenseKey' => $access?->license_key,

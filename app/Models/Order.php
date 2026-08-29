@@ -55,6 +55,11 @@ class Order extends Model
         return $this->hasOne(Payment::class);
     }
 
+    public function payments(): HasMany
+    {
+        return $this->hasMany(Payment::class);
+    }
+
     public function accesses(): HasMany
     {
         return $this->hasMany(ProductAccess::class);
