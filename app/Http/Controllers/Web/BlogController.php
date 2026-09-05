@@ -46,6 +46,7 @@ class BlogController extends Controller
             'gradient' => 'from-blue-600 via-indigo-700 to-slate-900',
             'tags' => [$post->category, 'Tutorial', 'Best Practice', 'Engineering'],
             'coverImage' => $post->cover_image,
+            'cover_image' => $post->cover_image,
             'views' => $post->views_count,
             'content' => [
                 'intro' => $post->excerpt,

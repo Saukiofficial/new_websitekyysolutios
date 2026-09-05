@@ -1,5 +1,7 @@
+import { useState } from 'react';
 import { Head, Link } from '@inertiajs/react';
 import PublicLayout from '@/Layouts/PublicLayout';
+import ReactMarkdown from 'react-markdown';
 import { 
     Clock, 
     Calendar, 
@@ -12,9 +14,56 @@ import {
     MessageSquare, 
     BookOpen,
     ShieldCheck,
-    Zap
+    Zap,
+    Copy
 } from 'lucide-react';
 import { motion } from 'framer-motion';
+
+function CodeSnippet({ className, children, ...props }) {
+    const [copied, setCopied] = useState(false);
+    const match = /language-(\w+)/.exec(className || '');
+    const language = match ? match[1] : '';
+    const codeString = String(children).replace(/\n$/, '');
+
+    const handleCopy = () => {
+        navigator.clipboard.writeText(codeString);
+        setCopied(true);
+        setTimeout(() => setCopied(false), 2000);
+    };
+
+    return (
+        <div className="my-6 rounded-2xl overflow-hidden border border-slate-800 bg-[#071328] shadow-xl text-left">
+            <div className="flex items-center justify-between px-4 py-2 bg-slate-900/90 border-b border-slate-800/80 text-xs font-mono">
+                <span className="text-blue-400 font-bold uppercase tracking-wider text-[11px] flex items-center gap-1.5">
+                    <span className="w-2 h-2 rounded-full bg-blue-500 inline-block animate-pulse" />
+                    {language || 'code'}
+                </span>
+                <button
+                    type="button"
+                    onClick={handleCopy}
+                    className="inline-flex items-center space-x-1.5 px-2.5 py-1 rounded-md bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white transition-colors cursor-pointer text-[11px]"
+                >
+                    {copied ? (
+                        <>
+                            <Check className="w-3.5 h-3.5 text-emerald-400" />
+                            <span className="text-emerald-400 font-bold">Tersalin!</span>
+                        </>
+                    ) : (
+                        <>
+                            <Copy className="w-3.5 h-3.5" />
+                            <span>Salin Kode</span>
+                        </>
+                    )}
+                </button>
+            </div>
+            <pre className="p-4 sm:p-5 overflow-x-auto text-xs sm:text-sm font-mono text-slate-200 leading-relaxed">
+                <code className={className} {...props}>
+                    {children}
+                </code>
+            </pre>
+        </div>
+    );
+}
 
 export default function BlogShow({ article, relatedArticles = [] }) {
     const handleShare = () => {
@@ -29,6 +78,9 @@ export default function BlogShow({ article, relatedArticles = [] }) {
             alert('Tautan artikel telah disalin ke clipboard!');
         }
     };
+
+    const coverImage = article.cover_image || article.coverImage;
+    const rawContent = article.content?.raw || article.content?.sections?.[0]?.body || '';
 
     return (
         <PublicLayout>
@@ -103,10 +155,10 @@ export default function BlogShow({ article, relatedArticles = [] }) {
                     </div>
 
                     {/* Hero Banner Cover Image */}
-                    {article.cover_image && (
+                    {coverImage && (
                         <div className="w-full aspect-video rounded-3xl overflow-hidden shadow-xl border border-slate-200 bg-slate-900 mb-8">
                             <img 
-                                src={article.cover_image} 
+                                src={coverImage} 
                                 alt={article.title} 
                                 className="w-full h-full object-cover" 
                             />
@@ -119,21 +171,53 @@ export default function BlogShow({ article, relatedArticles = [] }) {
                     <div className="space-y-8 text-slate-700 leading-relaxed text-sm sm:text-base font-normal">
                         
                         {/* Introduction Card */}
-                        <div className="p-6 rounded-2xl bg-blue-50/60 border border-blue-100 text-slate-800 text-sm sm:text-base leading-relaxed">
-                            {article.content.intro}
-                        </div>
-
-                        {/* Structured Sections */}
-                        {article.content.sections.map((sec, idx) => (
-                            <div key={idx} className="space-y-3 pt-2">
-                                <h2 className="text-xl sm:text-2xl font-bold text-[#0F172A] tracking-tight">
-                                    {sec.heading}
-                                </h2>
-                                <p className="text-slate-600 leading-relaxed text-sm sm:text-base">
-                                    {sec.body}
-                                </p>
+                        {article.content?.intro && (
+                            <div className="p-6 rounded-2xl bg-blue-50/60 border border-blue-100 text-slate-800 text-sm sm:text-base leading-relaxed">
+                                {article.content.intro}
                             </div>
-                        ))}
+                        )}
+
+                        {/* Markdown Rendered Content Body */}
+                        <div className="prose prose-slate max-w-none">
+                            <ReactMarkdown
+                                components={{
+                                    h2: ({node, ...props}) => (
+                                        <h2 className="text-xl sm:text-2xl font-black text-[#0F172A] tracking-tight mt-10 mb-4 pb-2 border-b border-slate-200/80" {...props} />
+                                    ),
+                                    h3: ({node, ...props}) => (
+                                        <h3 className="text-lg sm:text-xl font-bold text-[#0F172A] tracking-tight mt-7 mb-3" {...props} />
+                                    ),
+                                    p: ({node, ...props}) => (
+                                        <p className="text-slate-600 leading-relaxed text-sm sm:text-base my-3.5" {...props} />
+                                    ),
+                                    ul: ({node, ...props}) => (
+                                        <ul className="list-disc pl-6 space-y-2 my-4 text-slate-600 text-sm sm:text-base" {...props} />
+                                    ),
+                                    ol: ({node, ...props}) => (
+                                        <ol className="list-decimal pl-6 space-y-2 my-4 text-slate-600 text-sm sm:text-base" {...props} />
+                                    ),
+                                    blockquote: ({node, ...props}) => (
+                                        <blockquote className="p-4 sm:p-5 my-5 rounded-2xl border-l-4 border-blue-600 bg-blue-50/50 text-slate-700 italic text-sm sm:text-base shadow-2xs" {...props} />
+                                    ),
+                                    code: ({node, inline, className, children, ...props}) => {
+                                        if (inline) {
+                                            return (
+                                                <code className="px-1.5 py-0.5 rounded-md bg-slate-100 text-blue-600 font-mono text-xs font-semibold" {...props}>
+                                                    {children}
+                                                </code>
+                                            );
+                                        }
+                                        return (
+                                            <CodeSnippet className={className} {...props}>
+                                                {children}
+                                            </CodeSnippet>
+                                        );
+                                    }
+                                }}
+                            >
+                                {rawContent}
+                            </ReactMarkdown>
+                        </div>
 
                         {/* Key Takeaways Callout */}
                         {article.content.keyTakeaways && (

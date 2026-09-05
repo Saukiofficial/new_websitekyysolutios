@@ -185,4 +185,79 @@ class AdminBlogController extends Controller
 
         return redirect()->back()->with('success', 'Status artikel unggulan berhasil diubah.');
     }
+
+    /**
+     * Generate complete technical article/tutorial with AI and thumbnail.
+     */
+    public function generateAiArticle(Request $request, \App\Services\AiBlogService $aiBlogService)
+    {
+        $validated = $request->validate([
+            'topic' => 'required|string|min:3|max:300',
+            'category' => 'nullable|string|max:100',
+            'type' => 'nullable|string|in:tutorial,architecture,best_practice,security,overview',
+            'language' => 'nullable|string|in:id,en',
+            'thumbnail_style' => 'nullable|string|in:modern_tech,cyber_dark,blueprint_3d,code_terminal,abstract_gradient',
+            'instructions' => 'nullable|string|max:1000',
+        ]);
+
+        try {
+            $result = $aiBlogService->generateArticle($validated);
+
+            return response()->json([
+                'status' => 'success',
+                'message' => 'Artikel dan thumbnail berhasil digenerate oleh AI!',
+                'data' => $result,
+            ]);
+        } catch (\Throwable $e) {
+            return response()->json([
+                'status' => 'error',
+                'message' => $e->getMessage(),
+            ], 500);
+        }
+    }
+
+    /**
+     * Regenerate AI Thumbnail with specific prompt and style.
+     */
+    public function generateAiThumbnail(Request $request, \App\Services\AiBlogService $aiBlogService)
+    {
+        $validated = $request->validate([
+            'prompt' => 'required|string|min:3|max:500',
+            'style' => 'nullable|string|in:modern_tech,cyber_dark,blueprint_3d,code_terminal,abstract_gradient',
+            'category' => 'nullable|string|max:100',
+        ]);
+
+        try {
+            $imageUrl = $aiBlogService->generateThumbnail(
+                $validated['prompt'],
+                $validated['style'] ?? 'modern_tech',
+                $validated['category'] ?? 'Engineering'
+            );
+
+            return response()->json([
+                'status' => 'success',
+                'imageUrl' => $imageUrl,
+            ]);
+        } catch (\Throwable $e) {
+            return response()->json([
+                'status' => 'error',
+                'message' => $e->getMessage(),
+            ], 500);
+        }
+    }
+
+    /**
+     * Search official tech logos and relevant images for blog cover.
+     */
+    public function searchImages(Request $request, \App\Services\AiBlogService $aiBlogService)
+    {
+        $query = $request->input('q', 'tech');
+        $results = $aiBlogService->searchTechLogos($query);
+
+        return response()->json([
+            'status' => 'success',
+            'results' => $results,
+        ]);
+    }
 }
+

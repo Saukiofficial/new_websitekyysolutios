@@ -180,6 +180,9 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
     // Blog & Knowledge Hub CMS
     Route::get('/blog', [AdminBlogController::class, 'index'])->name('blog');
     Route::post('/blog', [AdminBlogController::class, 'store'])->name('blog.store');
+    Route::post('/blog/ai/generate', [AdminBlogController::class, 'generateAiArticle'])->name('blog.ai.generate');
+    Route::post('/blog/ai/generate-thumbnail', [AdminBlogController::class, 'generateAiThumbnail'])->name('blog.ai.thumbnail');
+    Route::get('/blog/ai/search-images', [AdminBlogController::class, 'searchImages'])->name('blog.ai.search_images');
     Route::put('/blog/{id}', [AdminBlogController::class, 'update'])->name('blog.update');
     Route::delete('/blog/{id}', [AdminBlogController::class, 'destroy'])->name('blog.destroy');
     Route::patch('/blog/{id}/featured', [AdminBlogController::class, 'toggleFeatured'])->name('blog.featured');

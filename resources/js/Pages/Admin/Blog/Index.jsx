@@ -19,9 +19,11 @@ import {
     Layers,
     User,
     Calendar,
-    Globe
+    Globe,
+    Sparkles
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
+import AiBlogGeneratorModal from '@/Components/Admin/AiBlogGeneratorModal';
 
 export default function BlogIndex({ posts, categories = [], filters = {}, stats = {} }) {
     const [search, setSearch] = useState(filters.search || '');
@@ -30,7 +32,26 @@ export default function BlogIndex({ posts, categories = [], filters = {}, stats 
     
     // Modal states
     const [isModalOpen, setIsModalOpen] = useState(false);
+    const [isAiModalOpen, setIsAiModalOpen] = useState(false);
     const [editingPost, setEditingPost] = useState(null);
+
+    const handleApplyAiData = (data) => {
+        setEditingPost(null);
+        setFormData({
+            title: data.title || '',
+            category: data.category || 'Software Engineering',
+            excerpt: data.excerpt || '',
+            content: data.content || '',
+            cover_image: null,
+            cover_image_url: data.cover_image_url || '',
+            author_name: data.author_name || 'KyySolutions Core Team',
+            author_role: data.author_role || 'Principal Software Architect',
+            read_time: data.read_time || '6 min baca',
+            is_featured: false,
+            status: data.status || 'draft',
+        });
+        setIsModalOpen(true);
+    };
     const [formData, setFormData] = useState({
         title: '',
         category: 'Software Engineering',
@@ -145,22 +166,32 @@ export default function BlogIndex({ posts, categories = [], filters = {}, stats 
                         </p>
                     </div>
 
-                    <div className="flex items-center space-x-3">
+                    <div className="flex flex-wrap items-center gap-2.5">
                         <Link
                             href="/blog"
                             target="_blank"
-                            className="px-4 py-2.5 rounded-xl border border-slate-200 hover:bg-slate-50 text-slate-700 text-xs font-bold transition-colors inline-flex items-center space-x-1.5"
+                            className="px-3.5 py-2.5 rounded-xl border border-slate-200 hover:bg-slate-50 text-slate-700 text-xs font-bold transition-colors inline-flex items-center space-x-1.5"
                         >
                             <ExternalLink className="w-3.5 h-3.5" />
-                            <span>Lihat Blog Publik</span>
+                            <span>Lihat Publik</span>
                         </Link>
 
                         <button
+                            type="button"
+                            onClick={() => setIsAiModalOpen(true)}
+                            className="px-4 py-2.5 rounded-xl bg-gradient-to-r from-blue-600 via-indigo-600 to-blue-700 hover:from-blue-700 hover:to-indigo-700 text-white text-xs font-bold shadow-md shadow-blue-500/25 inline-flex items-center space-x-2 transition-all cursor-pointer group"
+                        >
+                            <Sparkles className="w-4 h-4 text-blue-200 group-hover:rotate-12 transition-transform" />
+                            <span>Generate Artikel AI</span>
+                        </button>
+
+                        <button
+                            type="button"
                             onClick={openCreateModal}
-                            className="px-5 py-2.5 rounded-xl bg-[#2563EB] hover:bg-[#1D4ED8] text-white text-xs font-bold shadow-md shadow-blue-500/20 inline-flex items-center space-x-2 transition-all cursor-pointer"
+                            className="px-4 py-2.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold shadow-md shadow-slate-900/15 inline-flex items-center space-x-2 transition-all cursor-pointer"
                         >
                             <Plus className="w-4 h-4" />
-                            <span>Tulis Artikel Baru</span>
+                            <span>Tulis Manual</span>
                         </button>
                     </div>
                 </div>
@@ -538,6 +569,13 @@ export default function BlogIndex({ posts, categories = [], filters = {}, stats 
                         </div>
                     )}
                 </AnimatePresence>
+
+                {/* 6. AI Article & Tutorial Studio Modal */}
+                <AiBlogGeneratorModal
+                    isOpen={isAiModalOpen}
+                    onClose={() => setIsAiModalOpen(false)}
+                    onApplyToForm={handleApplyAiData}
+                />
 
             </div>
         </AdminLayout>
